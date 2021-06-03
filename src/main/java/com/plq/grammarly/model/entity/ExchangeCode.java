@@ -1,4 +1,4 @@
-package com.plq.grammarly.entity;
+package com.plq.grammarly.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;

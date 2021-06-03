@@ -2,6 +2,7 @@ package com.plq.grammarly.util;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -17,6 +18,7 @@ import java.io.Serializable;
 @Setter
 @ToString
 @Builder
+@NoArgsConstructor
 public class Result<T> implements Serializable {
 
     private Integer code;
