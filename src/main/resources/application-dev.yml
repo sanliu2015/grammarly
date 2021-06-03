@@ -1,0 +1,13 @@
+server:
+    port: 10080
+
+spring:
+    data:
+        mongodb:
+            host: 121.4.232.40
+            port: 27017
+            database: grammarly
+            username: root
+            authentication-database: admin
+            password: 4qlPi9zeL1dqhtJ8
+#            uri: "mongodb://root:4qlPi9zeL1dqhtJ8@121.4.232.40:27017/grammarly?ssl=false"
