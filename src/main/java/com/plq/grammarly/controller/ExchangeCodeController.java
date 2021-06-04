@@ -1,6 +1,7 @@
 package com.plq.grammarly.controller;
 
 import java.util.List;
+import java.util.Set;
 
 import com.plq.grammarly.model.vo.GenParamVO;
 import com.plq.grammarly.service.ExchangeCodeService;
@@ -11,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -20,7 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @date 2021/06/03
  */
 @Controller
-@RequestMapping("exchange")
+@RequestMapping("exchangeCode")
 public class ExchangeCodeController {
 
     private final ExchangeCodeService exchangeCodeService;
@@ -29,13 +31,26 @@ public class ExchangeCodeController {
         this.exchangeCodeService = exchangeCodeService;
     }
 
+    /**
+     * 生成兑换码
+     * @param genParamVO
+     * @return
+     */
     @PostMapping("/gen")
     @ResponseBody
     public Result gen(@RequestBody @Validated GenParamVO genParamVO) {
-        List<String> numbers = exchangeCodeService.gen(genParamVO);
+        Set<String> numbers = exchangeCodeService.gen(genParamVO);
         return Result.success(numbers);
     }
 
-
+    /**
+     * 兑换码兑换
+     * @param number 兑换码
+     * @return
+     */
+    @PostMapping("/exchange")
+    public Result exchange(@RequestParam String number) {
+        return exchangeCodeService.exchange(number);
+    }
 
 }

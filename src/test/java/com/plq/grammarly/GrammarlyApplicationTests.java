@@ -33,7 +33,7 @@ class GrammarlyApplicationTests {
 	@Test
 	void insertDataToMongo() {
 		ExchangeCode exchangeCode = new ExchangeCode();
-		exchangeCode.setNumber(RandomUtil.randomString(10));
+		exchangeCode.setNumber(RandomUtil.randomString(16));
 		exchangeCodeRepository.insert(exchangeCode);
 	}
 

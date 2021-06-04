@@ -1,8 +1,9 @@
 package com.plq.grammarly.service;
 
-import java.util.List;
+import java.util.Set;
 
 import com.plq.grammarly.model.vo.GenParamVO;
+import com.plq.grammarly.util.Result;
 
 /**
  * This is Description
@@ -17,5 +18,12 @@ public interface ExchangeCodeService {
      * @param genParamVO
      * @return
      */
-    List<String> gen(GenParamVO genParamVO);
+    Set<String> gen(GenParamVO genParamVO);
+
+    /**
+     * 兑换
+     * @param number
+     * @return
+     */
+    Result exchange(String number);
 }

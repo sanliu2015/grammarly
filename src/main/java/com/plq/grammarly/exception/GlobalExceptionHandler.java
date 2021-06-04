@@ -81,7 +81,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public Result methodArgumentValidationHandler(HttpServletRequest request, MethodArgumentNotValidException methodArgumentNotValidException){
         log.error("异常:" + request.getRequestURI(), methodArgumentNotValidException);
-        log.error("请求参数错误！{} ，参数数据：{}", getExceptionDetail(methodArgumentNotValidException), showParams(request));
+//        log.error("请求参数错误！{} ，参数数据：{}", getExceptionDetail(methodArgumentNotValidException), showParams(request));
         Result result = new Result();
         result.setCode(HttpStatus.BAD_REQUEST.value());
         if (!CollectionUtils.isEmpty(methodArgumentNotValidException.getBindingResult().getAllErrors())) {
