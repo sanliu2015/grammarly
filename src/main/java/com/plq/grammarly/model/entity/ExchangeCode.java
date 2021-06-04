@@ -3,6 +3,7 @@ package com.plq.grammarly.model.entity;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Tolerate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -18,10 +19,9 @@ import java.util.Date;
  * @author luquan.peng
  * @date 2021/06/03
  */
-@Data
 @Document
 @Builder
-@NoArgsConstructor
+@Data
 public class ExchangeCode implements Serializable {
 
     @Id
@@ -91,6 +91,7 @@ public class ExchangeCode implements Serializable {
     @LastModifiedDate
     private Date updateTime;
 
-
+    @Tolerate
+    public ExchangeCode() {}
 
 }

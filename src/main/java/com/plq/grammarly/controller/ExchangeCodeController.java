@@ -3,6 +3,7 @@ package com.plq.grammarly.controller;
 import java.util.List;
 import java.util.Set;
 
+import com.plq.grammarly.model.vo.ExchangeParamVO;
 import com.plq.grammarly.model.vo.GenParamVO;
 import com.plq.grammarly.service.ExchangeCodeService;
 import com.plq.grammarly.util.Result;
@@ -45,12 +46,12 @@ public class ExchangeCodeController {
 
     /**
      * 兑换码兑换
-     * @param number 兑换码
+     * @param exchangeParamVO 兑换参数
      * @return
      */
     @PostMapping("/exchange")
-    public Result exchange(@RequestParam String number) {
-        return exchangeCodeService.exchange(number);
+    public Result exchange(@RequestBody @Validated ExchangeParamVO exchangeParamVO) {
+        return exchangeCodeService.exchange(exchangeParamVO);
     }
 
 }

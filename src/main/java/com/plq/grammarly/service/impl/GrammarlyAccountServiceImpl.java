@@ -32,4 +32,9 @@ public class GrammarlyAccountServiceImpl implements GrammarlyAccountService {
         Example<GrammarlyAccount> example = Example.of(grammarlyAccount);
         return grammarlyAccountRepository.findAll(example);
     }
+
+    @Override
+    public List<GrammarlyAccount> listAll() {
+        return grammarlyAccountRepository.findAll();
+    }
 }

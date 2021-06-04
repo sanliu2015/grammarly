@@ -2,6 +2,7 @@ package com.plq.grammarly.service;
 
 import java.util.Set;
 
+import com.plq.grammarly.model.vo.ExchangeParamVO;
 import com.plq.grammarly.model.vo.GenParamVO;
 import com.plq.grammarly.util.Result;
 
@@ -22,8 +23,8 @@ public interface ExchangeCodeService {
 
     /**
      * 兑换
-     * @param number
+     * @param exchangeParamVO
      * @return
      */
-    Result exchange(String number);
+    Result exchange(ExchangeParamVO exchangeParamVO);
 }

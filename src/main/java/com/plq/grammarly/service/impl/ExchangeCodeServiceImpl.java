@@ -2,20 +2,32 @@ package com.plq.grammarly.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpStatus;
+import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONUtil;
 import com.plq.grammarly.model.entity.ExchangeCode;
 import com.plq.grammarly.model.entity.GrammarlyAccount;
+import com.plq.grammarly.model.vo.ExchangeParamVO;
 import com.plq.grammarly.model.vo.GenParamVO;
 import com.plq.grammarly.repository.ExchangeCodeRepository;
 import com.plq.grammarly.service.ExchangeCodeService;
 import com.plq.grammarly.service.GrammarlyAccountService;
+import com.plq.grammarly.util.BizUtil;
 import com.plq.grammarly.util.Result;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -24,6 +36,7 @@ import java.util.Set;
  * @author luquan.peng
  * @date 2021/06/03
  */
+@Slf4j
 @Service
 public class ExchangeCodeServiceImpl implements ExchangeCodeService {
 
@@ -58,8 +71,8 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Result exchange(String number) {
-        Example<ExchangeCode> example = Example.of(ExchangeCode.builder().number(number).build());
+    public Result exchange(ExchangeParamVO exchangeParamVO) {
+        Example<ExchangeCode> example = Example.of(ExchangeCode.builder().number(exchangeParamVO.getNumber()).build());
         ExchangeCode exchangeCode = exchangeCodeRepository.findOne(example).get();
         if (exchangeCode == null) {
             return Result.failure("不存在此兑换码");
@@ -72,18 +85,77 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                     return Result.failure("此兑换码已经过了截止兑换日期：" + DateUtil.format(exchangeCode.getExchangeDeadline(), "yyyyMMdd"));
                 }
             }
-            addMember(exchangeCode);
+            exchangeCode.setEmail(exchangeParamVO.getEmail());
+            boolean result = addMember(exchangeCode);
+            if (result) {
+                return Result.success("兑换成功，请前往您的邮箱进行查收！");
+            } else {
+                return Result.failure("兑换过程出错，请联系商家或管理员！");
+            }
         }
-        return Result.success();
+
     }
 
     /**
      * 邀请成员
      * @param exchangeCode
      */
-    private void addMember(ExchangeCode exchangeCode) {
+    private boolean addMember(ExchangeCode exchangeCode) {
         String accountType = exchangeCode.getValidDays() < 30 ? "0" : "1";
         List<GrammarlyAccount> accounts = grammarlyAccountService.listByAccountType(accountType);
+        // 如果优先根据会员天数对应分类没找到，采取查找所有
+        if (accounts.size() == 0) {
+            log.error("优先根据会员天数{}对应分类没找到grammarly账号配置，故查找所有分类配置", exchangeCode.getValidDays());
+            accounts = grammarlyAccountService.listAll();
+        }
+        Collections.shuffle(accounts);
+        boolean successFlag = false;
+        log.info("用户开始兑换{},所填邮箱:{},候选grammarly账号数:{}", exchangeCode.getNumber(), exchangeCode.getEmail(), accounts);
+        if (accounts.size() > 0) {
+            List<Map<String, Object>> dataList = new ArrayList<>();
+            Map<String, Object> map = new HashMap<>(16);
+            map.put("email", exchangeCode.getEmail());
+            map.put("firstName", "");
+            map.put("secondName", "");
+            map.put("ineligibleEmail", false);
+            map.put("assignedToOtherInstitutionEmail", false);
+            dataList.add(map);
+            String body = JSONUtil.toJsonStr(dataList);
+            for (GrammarlyAccount grammarlyAccount : accounts) {
+                Map<String, String> httpRequestHeadMap = BizUtil.convertFromCurl(grammarlyAccount.getCurlStr());
+                HttpRequest httpRequest = BizUtil.buildInviteHttpRequest(httpRequestHeadMap, grammarlyAccount);
+                httpRequest.body(body);
+                try {
+                   HttpResponse httpResponse = httpRequest.timeout(30000).execute();
+                   if (httpResponse.getStatus() == HttpStatus.HTTP_OK) {
+                       successFlag = true;
+                       exchangeCode.setInviterAccount(grammarlyAccount.getAccount());
+                       exchangeCode.setExchangeTime(new Date());
+                       exchangeCode.setExchangeStatus(true);
+                       exchangeCode.setMemberDeadline(DateUtil.offsetDay(exchangeCode.getExchangeTime(), exchangeCode.getValidDays()));
+                       exchangeCode.setErrorMsg("");
+                       exchangeCodeRepository.save(exchangeCode);
+                   } else {
+                       StringBuilder sb = new StringBuilder(exchangeCode.getErrorMsg() == null ? "" : exchangeCode.getErrorMsg());
+                       sb.append("grammarly账号：").append(grammarlyAccount.getAccount())
+                               .append("邀请失败，响应码:").append(httpResponse.getStatus())
+                               .append("|");
+                       log.info("grammarly账号：{}，邀请{}失败，响应码：{}，响应体：{}", grammarlyAccount.getAccount(),
+                               exchangeCode.getEmail(), httpResponse.getStatus(), httpResponse.body());
+                       exchangeCode.setErrorMsg(sb.toString());
+                   }
+                } catch (Exception e) {
 
+                }
+            }
+        } else {
+            log.error("可用grammarly账号配置总数为0");
+        }
+
+        if (!successFlag) {
+            log.error("用户{}兑换{}失败", exchangeCode.getEmail(), exchangeCode.getNumber());
+        }
+        log.info("用户结束兑换{},结果{}", exchangeCode.getNumber(), successFlag);
+        return successFlag;
     }
 }
