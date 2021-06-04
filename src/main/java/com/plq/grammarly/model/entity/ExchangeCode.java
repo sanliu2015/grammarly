@@ -5,6 +5,7 @@ import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -27,6 +28,7 @@ public class ExchangeCode {
      * 兑换码
      * // @Field("number") // 代表一个字段，可以不加，不加的话默认以参数名为列名
      */
+    @Indexed(unique = true)
     private String number;
     /**
      * 兑换码兑换后激活的grammar账号有效天数
