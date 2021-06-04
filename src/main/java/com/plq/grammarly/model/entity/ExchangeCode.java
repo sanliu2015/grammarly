@@ -18,7 +18,7 @@ import java.util.Date;
  * @date 2021/06/03
  */
 @Data
-@Document("exchange_code")
+@Document
 public class ExchangeCode {
 
     @Id
@@ -26,7 +26,6 @@ public class ExchangeCode {
 
     /**
      * 兑换码
-     * // @Field("number") // 代表一个字段，可以不加，不加的话默认以参数名为列名
      */
     @Indexed(unique = true)
     private String number;
