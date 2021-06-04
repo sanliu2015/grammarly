@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class TestTask {
 
-    @Scheduled(fixedRate = 1000L*60*20)
+//    @Scheduled(fixedRate = 1000L*60*20)
     public void test() {
         try {
             HttpRequest httpRequest = HttpUtil.createGet("https://data.grammarly.com/api/mimic/withProps")

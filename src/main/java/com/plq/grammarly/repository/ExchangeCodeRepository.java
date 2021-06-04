@@ -1,6 +1,6 @@
 package com.plq.grammarly.repository;
 
-import com.plq.grammarly.entity.ExchangeCode;
+import com.plq.grammarly.model.entity.ExchangeCode;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 /**

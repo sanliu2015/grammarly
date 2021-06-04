@@ -49,154 +49,147 @@ public class GlobalExceptionHandler {
      * 链接：https://www.jianshu.com/p/578b2d1800e4
      * 来源：简书
      * 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
-     * @param exception
-     * @return
      */
-
 
     /**
      * 方法参数校验异常 Validate
-     * @param request
-     * @param ex
-     * @return
+     * @param request 请求
+     * @param constraintViolationException 约束异常异常
+     * @return Result code 400
      */
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseBody
-    public Result handleValidationException(HttpServletRequest request, ConstraintViolationException ex) {
-        log.error("异常:" + request.getRequestURI(), ex);
-        String collect = ex.getConstraintViolations().stream().filter(Objects::nonNull)
-                .map(cv -> cv == null ? "null" : cv.getPropertyPath() + ": " + cv.getMessage())
+    public Result handleValidationException(HttpServletRequest request, ConstraintViolationException constraintViolationException) {
+        log.error("异常:" + request.getRequestURI(), constraintViolationException);
+        String collect = constraintViolationException.getConstraintViolations().stream().filter(Objects::nonNull)
+                .map(cv -> cv.getPropertyPath() + ": " + cv.getMessage())
                 .collect(Collectors.joining(", "));
-        Result<String> Result = new Result();
-        log.info("请求参数异常", collect);
-        Result.setCode(HttpStatus.BAD_REQUEST.value());
-        Result.setMsg(ex.getMessage());
-        return Result;
+        log.error("请求参数异常！{}", collect);
+        return Result.builder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .msg(constraintViolationException.getMessage())
+                .build();
     }
 
     /**
      * Bean 校验异常 Validate
-     * @param request
-     * @param exception
-     * @return 400
+     * @param request 请求
+     * @param methodArgumentNotValidException Valid注释的参数的验证失败
+     * @return Result code 400
      */
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     @ResponseBody
-    public Result methodArgumentValidationHandler(HttpServletRequest request, MethodArgumentNotValidException exception){
-        log.info("异常:" + request.getRequestURI(), exception);
-        log.info("请求参数错误！{}",getExceptionDetail(exception),"参数数据：" + showParams(request));
-        Result<String> Result = new Result();
-        Result.setCode(HttpStatus.BAD_REQUEST.value());
-        if (exception.getBindingResult() != null && !CollectionUtils.isEmpty(exception.getBindingResult().getAllErrors())) {
-            Result.setMsg(exception.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+    public Result methodArgumentValidationHandler(HttpServletRequest request, MethodArgumentNotValidException methodArgumentNotValidException){
+        log.error("异常:" + request.getRequestURI(), methodArgumentNotValidException);
+        log.error("请求参数错误！{} ，参数数据：{}", getExceptionDetail(methodArgumentNotValidException), showParams(request));
+        Result result = new Result();
+        result.setCode(HttpStatus.BAD_REQUEST.value());
+        if (!CollectionUtils.isEmpty(methodArgumentNotValidException.getBindingResult().getAllErrors())) {
+            result.setMsg(methodArgumentNotValidException.getBindingResult().getAllErrors().get(0).getDefaultMessage());
         } else {
-            Result.setMsg(exception.getMessage());
+            result.setMsg(methodArgumentNotValidException.getMessage());
         }
-        return Result;
+        return result;
     }
 
     /**
      * 绑定异常
-     * @param request
-     * @param pe
-     * @return
+     * @param request 请求
+     * @param bindException 绑定异常
+     * @return Result code 400
      */
     @ExceptionHandler(BindException.class)
     @ResponseBody
-    public Result bindException(HttpServletRequest request, BindException pe) {
-        log.error("异常:" + request.getRequestURI(), pe);
-        Result<String> Result = new Result();
-        Map map = new HashMap();
-        if(pe.getBindingResult()!=null){
-            List<ObjectError> allErrors = pe.getBindingResult().getAllErrors();
-            allErrors.stream().filter(Objects::nonNull).forEach(objectError -> {
-                map.put("请求路径："+request.getRequestURI()+"--请求参数："+(((FieldError) ((FieldError) allErrors.get(0))).getField().toString()),objectError.getDefaultMessage());
-            });
-        }
-        Result.setCode(HttpStatus.BAD_REQUEST.value());
-        Result.setMsg("请求参数绑定失败");
-        Result.setData(map.toString());
-        return Result;
+    public Result bindException(HttpServletRequest request, BindException bindException) {
+        log.error("异常:" + request.getRequestURI(), bindException);
+        Map<String, Object> map = new HashMap<>(16);
+        List<ObjectError> allErrors = bindException.getBindingResult().getAllErrors();
+        allErrors.stream().filter(Objects::nonNull)
+                .forEach(objectError -> map.put("请求路径："+request.getRequestURI()+"--请求参数："+(((FieldError) allErrors.get(0)).getField()),objectError.getDefaultMessage()));
+        return Result.builder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .msg("请求参数绑定失败")
+                .data(map)
+                .build();
     }
 
 
     /**
      * 访问接口参数不全
-     * @param request
-     * @param pe
-     * @return
+     * @param request 请求
+     * @param missingServletRequestParameterException 丢失参数
+     * @return Result code 400
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseBody
-    public Result missingServletRequestParameterException(HttpServletRequest request, MissingServletRequestParameterException pe) {
-        log.error("异常:" + request.getRequestURI(), pe);
-        Result<String> Result = new Result();
-        Result.setCode(HttpStatus.BAD_REQUEST.value());
-        Result.setMsg("该请求路径：" + request.getRequestURI() + "下的请求参数不全：" + pe.getMessage());
-        return Result;
+    public Result missingServletRequestParameterException(HttpServletRequest request, MissingServletRequestParameterException missingServletRequestParameterException) {
+        log.error("异常:" + request.getRequestURI(), missingServletRequestParameterException);
+        return Result.builder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .msg("请求参数不全")
+                .build();
     }
 
     /**
-     * HttpRequestMethodNotSupportedException
-     * @param request
-     * @param pe
-     * @return
+     * 请求方法方式不支持异常
+     * @param request 请求
+     * @param httpRequestMethodNotSupportedException 请求方法不支持异常
+     * @return Result code 400
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseBody
-    public Result httpRequestMethodNotSupportedException(HttpServletRequest request, HttpRequestMethodNotSupportedException pe) {
-        log.error("异常:" + request.getRequestURI(), pe);
-        Result<String> Result = new Result();
-        Result.setCode(HttpStatus.BAD_REQUEST.value());
-        Result.setMsg("请求方式不正确");
-        return Result;
+    public Result httpRequestMethodNotSupportedException(HttpServletRequest request, HttpRequestMethodNotSupportedException httpRequestMethodNotSupportedException) {
+        log.error("异常:" + request.getRequestURI(), httpRequestMethodNotSupportedException);
+        return Result.builder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .msg("请求方式不正确")
+                .build();
     }
 
 
     /**
      * 其他异常
-     * @param request
-     * @param pe
-     * @return
+     * @param request 请求
+     * @param exception 异常
+     * @return Result code 400
      */
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    public Result otherException(HttpServletRequest request, Exception pe) {
-        log.error("异常:" + request.getRequestURI(), pe);
-        Result<String> Result = new Result();
-        Result.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        Result.setMsg(getExceptionDetail(pe));
-        return Result;
+    public Result otherException(HttpServletRequest request, Exception exception) {
+        log.error("异常:" + request.getRequestURI(), exception);
+        return Result.builder()
+                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .msg("系统异常，请联系管理员")
+                .data(getExceptionDetail(exception))
+                .build();
     }
 
     /**
      * 异常详情
-     * @param e
-     * @return
+     * @param e Exception
+     * @return string 异常详情
      */
     private String getExceptionDetail(Exception e) {
         StringBuilder stringBuffer = new StringBuilder(e.toString() + "\n");
         StackTraceElement[] messages = e.getStackTrace();
-        Arrays.stream(messages).filter(Objects::nonNull).forEach(stackTraceElement -> {
-            stringBuffer.append(stackTraceElement.toString() + "\n");
-        });
+        Arrays.stream(messages).filter(Objects::nonNull)
+                .forEach(stackTraceElement -> stringBuffer.append(stackTraceElement.toString() + "\n"));
         return stringBuffer.toString();
     }
 
     /**
      * 请求参数
-     * @param request
-     * @return
+     * @param request 请求
+     * @return string params
      */
-    public  String showParams(HttpServletRequest request) {
-        Map<String,Object> map = new HashMap<String,Object>();
+    public String showParams(HttpServletRequest request) {
         StringBuilder stringBuilder=new StringBuilder();
-        Enumeration paramNames = request.getParameterNames();
+        Enumeration<String> paramNames = request.getParameterNames();
         stringBuilder.append("----------------参数开始-------------------");
         stringBuilder.append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         if(Objects.nonNull(paramNames)){
             while (paramNames.hasMoreElements()) {
-                String paramName = (String) paramNames.nextElement();
+                String paramName = paramNames.nextElement();
                 String[] paramValues = request.getParameterValues(paramName);
                 if (paramValues.length >0) {
                     String paramValue = paramValues[0];

@@ -35,4 +35,7 @@ public class ExchangeCodeController {
         List<String> numbers = exchangeCodeService.gen(genParamVO);
         return Result.success(numbers);
     }
+
+
+
 }

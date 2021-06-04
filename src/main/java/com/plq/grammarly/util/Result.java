@@ -9,7 +9,7 @@ import lombok.ToString;
 import java.io.Serializable;
 
 /**
- * This is Description
+ * 返回响应
  *
  * @author luquan.peng
  * @date 2021/06/03
