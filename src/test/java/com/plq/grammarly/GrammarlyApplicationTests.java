@@ -17,6 +17,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -39,7 +40,13 @@ class GrammarlyApplicationTests {
 	void insertDataToMongo() {
 		ExchangeCode exchangeCode = new ExchangeCode();
 		exchangeCode.setNumber(RandomUtil.randomString(16));
+		exchangeCode.setExchangeStatus(true);
+		exchangeCode.setRemoveStatus(false);
+		exchangeCode.setMemberDeadline(DateUtil.beginOfDay(new Date()));
 		exchangeCodeRepository.insert(exchangeCode);
+		List<ExchangeCode> exchangeCodes = exchangeCodeRepository
+				.findByExchangeStatusTrueAndRemoveStatusFalseAndMemberDeadlineLessThan(new Date());
+		System.out.println(JSONUtil.toJsonStr(exchangeCodes));
 	}
 
 	@Test
