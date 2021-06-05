@@ -44,4 +44,13 @@ public class GrammarlyAccountServiceImpl implements GrammarlyAccountService {
         return grammarlyAccountRepository.findOne(example).orElse(null);
     }
 
+    @Override
+    public void save(GrammarlyAccount grammarlyAccount) {
+        grammarlyAccountRepository.save(grammarlyAccount);
+    }
+
+    @Override
+    public GrammarlyAccount findById(String id) {
+        return grammarlyAccountRepository.findById(id).orElse(new GrammarlyAccount());
+    }
 }

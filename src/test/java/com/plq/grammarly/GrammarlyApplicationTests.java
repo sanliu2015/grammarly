@@ -9,6 +9,7 @@ import com.plq.grammarly.model.vo.GenParamVO;
 import com.plq.grammarly.repository.ExchangeCodeRepository;
 import com.plq.grammarly.repository.GrammarlyAccountRepository;
 import com.plq.grammarly.service.ExchangeCodeService;
+import com.plq.grammarly.task.GrammarlyTask;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +32,8 @@ class GrammarlyApplicationTests {
 	private ExchangeCodeRepository exchangeCodeRepository;
 	@Autowired
 	private GrammarlyAccountRepository grammarlyAccountRepository;
+	@Autowired
+	private GrammarlyTask grammarlyTask;
 
 	@Test
 	void contextLoads() {
@@ -84,6 +87,11 @@ class GrammarlyApplicationTests {
 		grammarlyAccount.setCurlStr(curl);
 
 
+	}
+
+	@Test
+	void testHeartBeat() {
+		grammarlyTask.keepHeartbeat();
 	}
 
 }

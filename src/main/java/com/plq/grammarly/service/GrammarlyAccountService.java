@@ -17,4 +17,8 @@ public interface GrammarlyAccountService {
     List<GrammarlyAccount> listAll();
 
     GrammarlyAccount findByAccount(String inviterAccount);
+
+    void save(GrammarlyAccount grammarlyAccount);
+
+    GrammarlyAccount findById(String id);
 }
