@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -68,7 +69,11 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                         .build();
                 exchangeCodes.add(exchangeCode);
                 genCount ++;
+                numbers.add(number);
             }
+        }
+        if (exchangeCodes.size() > 0) {
+            exchangeCodeRepository.saveAll(exchangeCodes);
         }
         return numbers;
     }
@@ -78,7 +83,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
     @Transactional(rollbackFor = Exception.class)
     public Result exchange(ExchangeParamVO exchangeParamVO) {
         Example<ExchangeCode> example = Example.of(ExchangeCode.builder().number(exchangeParamVO.getNumber()).build());
-        ExchangeCode exchangeCode = exchangeCodeRepository.findOne(example).get();
+        ExchangeCode exchangeCode = exchangeCodeRepository.findOne(example).orElse(null);
         if (exchangeCode == null) {
             return Result.failure("不存在此兑换码");
         } else {

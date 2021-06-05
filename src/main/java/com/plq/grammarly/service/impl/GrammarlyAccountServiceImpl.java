@@ -41,7 +41,7 @@ public class GrammarlyAccountServiceImpl implements GrammarlyAccountService {
         GrammarlyAccount grammarlyAccount = new GrammarlyAccount();
         grammarlyAccount.setAccount(account);
         Example<GrammarlyAccount> example = Example.of(grammarlyAccount);
-        return grammarlyAccountRepository.findOne(example).get();
+        return grammarlyAccountRepository.findOne(example).orElse(null);
     }
 
 }

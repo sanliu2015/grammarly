@@ -10,6 +10,7 @@ import com.plq.grammarly.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @date 2021/06/03
  */
 @Controller
-@RequestMapping("exchangeCode")
 public class ExchangeCodeController {
 
     private final ExchangeCodeService exchangeCodeService;
@@ -32,12 +32,22 @@ public class ExchangeCodeController {
         this.exchangeCodeService = exchangeCodeService;
     }
 
+    @GetMapping(value = { "index", "" } )
+    public String index() {
+        return "index";
+    }
+
+    @GetMapping("/grammarly/exchangeCode/gen")
+    public String genMng() {
+        return "gen";
+    }
+
     /**
      * 生成兑换码
      * @param genParamVO
      * @return
      */
-    @PostMapping("/gen")
+    @PostMapping("/grammarly/exchangeCode/gen")
     @ResponseBody
     public Result gen(@RequestBody @Validated GenParamVO genParamVO) {
         Set<String> numbers = exchangeCodeService.gen(genParamVO);
@@ -49,7 +59,8 @@ public class ExchangeCodeController {
      * @param exchangeParamVO 兑换参数
      * @return
      */
-    @PostMapping("/exchange")
+    @PostMapping("/grammarly/exchangeCode/exchange")
+    @ResponseBody
     public Result exchange(@RequestBody @Validated ExchangeParamVO exchangeParamVO) {
         return exchangeCodeService.exchange(exchangeParamVO);
     }

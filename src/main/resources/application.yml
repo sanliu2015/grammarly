@@ -5,8 +5,6 @@ server:
     threads:
       max: 100
       min-spare: 5
-  servlet:
-    context-path: /grammarly
 
 spring:
   application:
@@ -18,3 +16,11 @@ spring:
     time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm:ss
     default-property-inclusion: non_null
+  freemarker:
+    charset: utf-8
+    check-template-location: true
+    content-type: text/html
+    enabled: true
+    suffix: .ftl
+    template-loader-path: classpath:/templates #配置模板所在目录
+

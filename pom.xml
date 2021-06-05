@@ -15,11 +15,17 @@
 	<description>grammarly business api</description>
 	<properties>
 		<java.version>11</java.version>
+		<bootstrap.version>3.3.7</bootstrap.version>
+		<jquery.version>1.12.4</jquery.version>
+		<html5shiv.version>3.7.3</html5shiv.version>
+		<respond.version>1.4.2</respond.version>
+		<layer.version>3.1.1</layer.version>
+		<datetimepicker.version>4.17.47</datetimepicker.version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+			<artifactId>spring-boot-starter-freemarker</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -69,6 +75,36 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>30.1.1-jre</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>bootstrap</artifactId>
+			<version>${bootstrap.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>jquery</artifactId>
+			<version>${jquery.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>html5shiv</artifactId>
+			<version>${html5shiv.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>respond</artifactId>
+			<version>${respond.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars.bowergithub.sentsin</groupId>
+			<artifactId>layer</artifactId>
+			<version>${layer.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>Eonasdan-bootstrap-datetimepicker</artifactId>
+			<version>${datetimepicker.version}</version>
 		</dependency>
 	</dependencies>
 
