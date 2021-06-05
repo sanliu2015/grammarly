@@ -28,13 +28,9 @@ public class BizUtil {
                 int colonIdx = keyVal.indexOf(":");
                 if (colonIdx > -1) {
                     String key = keyVal.substring(0, colonIdx);
-//                    if (key.indexOf("x-") > -1 || "cookie".equals(key)) {
-//
-//                    }
                     headers.put(key, keyVal.substring(colonIdx + 2));
                 }
             }
-
         }
         return headers;
     }
@@ -44,7 +40,7 @@ public class BizUtil {
      * @param httpRequestHeadMap
      * @return
      */
-    public static HttpRequest buildInviteHttpRequest(Map<String, String> httpRequestHeadMap, GrammarlyAccount grammarlyAccount) {
+    public static HttpRequest buildInviteHttpRequest(Map<String, String> httpRequestHeadMap) {
         return HttpUtil.createPost("https://institution.grammarly.com/api/institution/admin/users/add")
                 .header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36")
                 .header("sec-fetch-site", "same-site")
@@ -66,7 +62,7 @@ public class BizUtil {
                 ;
     }
 
-    public static HttpRequest buildRemoveHttpRequest(Map<String, String> httpRequestHeadMap, GrammarlyAccount grammarlyAccount) {
+    public static HttpRequest buildRemoveHttpRequest(Map<String, String> httpRequestHeadMap) {
         return HttpUtil.createPost("https://institution.grammarly.com/api/institution/admin/users/delete")
                 .header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36")
                 .header("sec-fetch-site", "same-site")
@@ -79,6 +75,28 @@ public class BizUtil {
                 .header("content-type", "application/json")
                 .header("authority", "institution.grammarly.com")
                 .header("referer", "https://account.grammarly.com/admin/members")
+                .header("accept-language", "zh-CN,zh;q=0.9")
+                .header("x-container-id", httpRequestHeadMap.get("x-container-id"))
+                .header("x-csrf-token", httpRequestHeadMap.get("x-csrf-token"))
+                .header("x-client-type", httpRequestHeadMap.get("x-client-type"))
+                .header("x-client-version", httpRequestHeadMap.get("x-client-version"))
+                .header("cookie", httpRequestHeadMap.get("cookie"))
+                ;
+    }
+
+    public static HttpRequest buildQueryHttpRequest(Map<String, String> httpRequestHeadMap) {
+        return HttpUtil.createGet("https://institution.grammarly.com/api/institution/admin/users/find_all?offset=0&limit=10&order=email&order_type=asc&type=Invited")
+                .header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36")
+                .header("sec-fetch-site", "same-site")
+                .header("sec-fetch-mode", "cors")
+                .header("sec-fetch-dest", "empty")
+                .header("accept-language", "zh-CN,zh;q=0.9")
+                .header("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"")
+                .header("sec-ch-ua-mobile", "?0")
+                .header("origin", "https://account.grammarly.com")
+                .header("accept", "application/json")
+                .header("authority", "institution.grammarly.com")
+                .header("referer", "https://account.grammarly.com/customize/language")
                 .header("accept-language", "zh-CN,zh;q=0.9")
                 .header("x-container-id", httpRequestHeadMap.get("x-container-id"))
                 .header("x-csrf-token", httpRequestHeadMap.get("x-csrf-token"))
@@ -109,7 +127,6 @@ public class BizUtil {
                 "  --compressed";
         Map<String, String> t = convertFromCurl(s);
     }
-
 
 
 }

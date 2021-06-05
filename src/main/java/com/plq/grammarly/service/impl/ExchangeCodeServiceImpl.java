@@ -19,6 +19,7 @@ import com.plq.grammarly.util.BizUtil;
 import com.plq.grammarly.util.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +62,9 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                 ExchangeCode exchangeCode = ExchangeCode.builder()
                         .number(number).validDays(genParamVO.getValidDays())
                         .exchangeDeadline(genParamVO.getExchangeDeadline())
+                        .exchangeStatus(false)
+                        .expireStatus(false)
+                        .removeStatus(false)
                         .build();
                 exchangeCodes.add(exchangeCode);
                 genCount ++;
@@ -124,7 +128,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
             String body = JSONUtil.toJsonStr(dataList);
             for (GrammarlyAccount grammarlyAccount : accounts) {
                 Map<String, String> httpRequestHeadMap = BizUtil.convertFromCurl(grammarlyAccount.getCurlStr());
-                HttpRequest httpRequest = BizUtil.buildInviteHttpRequest(httpRequestHeadMap, grammarlyAccount);
+                HttpRequest httpRequest = BizUtil.buildInviteHttpRequest(httpRequestHeadMap);
                 httpRequest.body(body);
                 try {
                    HttpResponse httpResponse = httpRequest.timeout(30000).execute();
@@ -166,7 +170,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
         boolean flag = false;
         GrammarlyAccount grammarlyAccount = grammarlyAccountService.findByAccount(exchangeCode.getInviterAccount());
         Map<String, String> httpRequestHeadMap = BizUtil.convertFromCurl(grammarlyAccount.getCurlStr());
-        HttpRequest httpRequest = BizUtil.buildRemoveHttpRequest(httpRequestHeadMap, grammarlyAccount);
+        HttpRequest httpRequest = BizUtil.buildRemoveHttpRequest(httpRequestHeadMap);
         Map<String, Object> map = new HashMap<>(16);
         map.put("type", "Active");
         map.put("reverse", false);
@@ -193,5 +197,10 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
             log.error("grammarly删除用户网络异常");
         }
         return flag;
+    }
+
+    @Override
+    public List<ExchangeCode> listMemberExpire(Date date) {
+        return exchangeCodeRepository.findByExchangeStatusTrueAndRemoveStatusFalseAndMemberDeadlineLessThan(date);
     }
 }

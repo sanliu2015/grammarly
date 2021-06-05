@@ -1,5 +1,7 @@
 package com.plq.grammarly.service;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import com.plq.grammarly.model.entity.ExchangeCode;
@@ -35,4 +37,6 @@ public interface ExchangeCodeService {
      * @return
      */
     boolean remove(ExchangeCode exchangeCode);
+
+    List<ExchangeCode> listMemberExpire(Date now);
 }
