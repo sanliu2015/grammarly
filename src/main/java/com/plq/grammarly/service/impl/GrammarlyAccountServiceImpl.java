@@ -1,10 +1,8 @@
 package com.plq.grammarly.service.impl;
 
-import com.plq.grammarly.model.entity.ExchangeCode;
 import com.plq.grammarly.model.entity.GrammarlyAccount;
 import com.plq.grammarly.repository.GrammarlyAccountRepository;
 import com.plq.grammarly.service.GrammarlyAccountService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
@@ -37,4 +35,13 @@ public class GrammarlyAccountServiceImpl implements GrammarlyAccountService {
     public List<GrammarlyAccount> listAll() {
         return grammarlyAccountRepository.findAll();
     }
+
+    @Override
+    public GrammarlyAccount findByAccount(String account) {
+        GrammarlyAccount grammarlyAccount = new GrammarlyAccount();
+        grammarlyAccount.setAccount(account);
+        Example<GrammarlyAccount> example = Example.of(grammarlyAccount);
+        return grammarlyAccountRepository.findOne(example).get();
+    }
+
 }

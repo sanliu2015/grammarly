@@ -7,6 +7,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpStatus;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
+import com.google.common.collect.Lists;
 import com.plq.grammarly.model.entity.ExchangeCode;
 import com.plq.grammarly.model.entity.GrammarlyAccount;
 import com.plq.grammarly.model.vo.ExchangeParamVO;
@@ -145,7 +146,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                        exchangeCode.setErrorMsg(sb.toString());
                    }
                 } catch (Exception e) {
-
+                    log.error("grammarly邀请用户网络异常");
                 }
             }
         } else {
@@ -157,5 +158,40 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
         }
         log.info("用户结束兑换{},结果{}", exchangeCode.getNumber(), successFlag);
         return successFlag;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public boolean remove(ExchangeCode exchangeCode) {
+        boolean flag = false;
+        GrammarlyAccount grammarlyAccount = grammarlyAccountService.findByAccount(exchangeCode.getInviterAccount());
+        Map<String, String> httpRequestHeadMap = BizUtil.convertFromCurl(grammarlyAccount.getCurlStr());
+        HttpRequest httpRequest = BizUtil.buildRemoveHttpRequest(httpRequestHeadMap, grammarlyAccount);
+        Map<String, Object> map = new HashMap<>(16);
+        map.put("type", "Active");
+        map.put("reverse", false);
+        map.put("emails", Lists.newArrayList(exchangeCode.getEmail()));
+        httpRequest.body(JSONUtil.toJsonStr(map));
+        try {
+            HttpResponse httpResponse = httpRequest.timeout(30000).execute();
+            if (httpResponse.getStatus() == HttpStatus.HTTP_NO_CONTENT) {
+                exchangeCode.setRemoveStatus(true);
+                exchangeCode.setRemoveTime(new Date());
+                exchangeCode.setErrorMsg("");
+                exchangeCodeRepository.save(exchangeCode);
+                flag = true;
+            } else {
+                StringBuilder sb = new StringBuilder(exchangeCode.getErrorMsg() == null ? "" : exchangeCode.getErrorMsg());
+                sb.append("grammarly账号：").append(grammarlyAccount.getAccount())
+                        .append("删除失败，响应码:").append(httpResponse.getStatus())
+                        .append("|");
+                log.error("grammarly账号：{}，删除{}失败，响应码：{}，响应体：{}", grammarlyAccount.getAccount(),
+                        exchangeCode.getEmail(), httpResponse.getStatus(), httpResponse.body());
+                exchangeCode.setErrorMsg(sb.toString());
+            }
+        } catch (Exception e) {
+            log.error("grammarly删除用户网络异常");
+        }
+        return flag;
     }
 }

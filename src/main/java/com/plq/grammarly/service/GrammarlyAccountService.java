@@ -15,4 +15,6 @@ public interface GrammarlyAccountService {
     List<GrammarlyAccount> listByAccountType(String accountType);
 
     List<GrammarlyAccount> listAll();
+
+    GrammarlyAccount findByAccount(String inviterAccount);
 }
