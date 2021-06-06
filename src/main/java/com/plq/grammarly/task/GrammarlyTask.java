@@ -38,7 +38,7 @@ public class GrammarlyTask {
         this.exchangeCodeService = exchangeCodeService;
     }
 
-    @Scheduled(fixedRate = 1000L*60*20)
+//    @Scheduled(fixedRate = 1000L*60*20)
     public void keepHeartbeat() {
         List<GrammarlyAccount> grammarlyAccountList = grammarlyAccountService.listAll();
         for (GrammarlyAccount grammarlyAccount : grammarlyAccountList) {
