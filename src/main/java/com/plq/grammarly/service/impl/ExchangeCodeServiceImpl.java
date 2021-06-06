@@ -91,7 +91,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                 return Result.failure("此兑换码已经被兑换");
             }
             if (exchangeCode.getExchangeDeadline() != null) {
-                if (DateUtil.compare(exchangeCode.getExchangeDeadline(), new Date()) > 0) {
+                if (DateUtil.compare(exchangeCode.getExchangeDeadline(), new Date()) < 0) {
                     return Result.failure("此兑换码已经过了截止兑换日期：" + DateUtil.format(exchangeCode.getExchangeDeadline(), "yyyyMMdd"));
                 }
             }
