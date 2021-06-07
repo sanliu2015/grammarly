@@ -5,6 +5,8 @@ server:
     threads:
       max: 100
       min-spare: 5
+  servlet:
+    context-path: /grammarly
 
 spring:
   application:
@@ -17,6 +19,8 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     default-property-inclusion: non_null
   freemarker:
+    # 通用请求头，配合freemarker的request-context-attribute属性使用，通过${ctx.contextPath}获取该配置文件的上下文路径（也可以通过这种方式定义请求头）
+    request-context-attribute: ctx
     charset: utf-8
     check-template-location: true
     content-type: text/html

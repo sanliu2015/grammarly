@@ -6,20 +6,20 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>兑换码兑换</title>
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="${ctx.contextPath}/webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
 
     <!-- HTML5 shim 和 Respond.js 是为了让 IE8 支持 HTML5 元素和媒体查询（media queries）功能 -->
     <!-- 警告：通过 file:// 协议（就是直接将 html 页面拖拽到浏览器中）访问页面时 Respond.js 不起作用 -->
     <!--[if lt IE 9]>
-    <script src="/webjars/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="/webjars/respond/1.4.2/dest/respond.min.js"></script>
+    <script src="${ctx.contextPath}/webjars/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="${ctx.contextPath}/webjars/respond/1.4.2/dest/respond.min.js"></script>
     <![endif]-->
     <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
-    <script src="/webjars/jquery/1.12.4/jquery.min.js"></script>
+    <script src="${ctx.contextPath}/webjars/jquery/1.12.4/jquery.min.js"></script>
     <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
-    <script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="${ctx.contextPath}/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <!-- 日期控件 -->
-    <script src="/webjars/layer/dist/layer.js"></script>
+    <script src="${ctx.contextPath}/webjars/layer/dist/layer.js"></script>
 </head>
 <body>
 <div class="container">
@@ -61,7 +61,7 @@
         }
         layer.load();
         $.ajax({
-            url: "/grammarly/exchangeCode/exchange",
+            url: "${ctx.contextPath}/exchangeCode/exchange",
             type: "post",
             contentType: 'application/json',
             cache: false,
