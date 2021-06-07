@@ -5,7 +5,6 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpStatus;
-import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Lists;
 import com.plq.grammarly.model.entity.ExchangeCode;
@@ -19,7 +18,6 @@ import com.plq.grammarly.util.BizUtil;
 import com.plq.grammarly.util.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +28,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -103,12 +100,11 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                 return Result.failure("兑换过程出错，请联系商家或管理员！");
             }
         }
-
     }
 
     /**
      * 邀请成员
-     * @param exchangeCode
+     * @param exchangeCode 兑换实体
      */
     private boolean addMember(ExchangeCode exchangeCode) {
         String accountType = exchangeCode.getValidDays() < 30 ? "0" : "1";
@@ -144,7 +140,6 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                        exchangeCode.setExchangeStatus(true);
                        exchangeCode.setMemberDeadline(DateUtil.offsetDay(exchangeCode.getExchangeTime(), exchangeCode.getValidDays()));
                        exchangeCode.setErrorMsg("");
-                       exchangeCodeRepository.save(exchangeCode);
                    } else {
                        StringBuilder sb = new StringBuilder(exchangeCode.getErrorMsg() == null ? "" : exchangeCode.getErrorMsg());
                        sb.append("grammarly账号：").append(grammarlyAccount.getAccount())
@@ -154,6 +149,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                                exchangeCode.getEmail(), httpResponse.getStatus(), httpResponse.body());
                        exchangeCode.setErrorMsg(sb.toString());
                    }
+                    exchangeCodeRepository.save(exchangeCode);
                 } catch (Exception e) {
                     log.error("grammarly邀请用户网络异常");
                 }
@@ -187,7 +183,6 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                 exchangeCode.setRemoveStatus(true);
                 exchangeCode.setRemoveTime(new Date());
                 exchangeCode.setErrorMsg("");
-                exchangeCodeRepository.save(exchangeCode);
                 flag = true;
             } else {
                 StringBuilder sb = new StringBuilder(exchangeCode.getErrorMsg() == null ? "" : exchangeCode.getErrorMsg());
@@ -198,6 +193,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                         exchangeCode.getEmail(), httpResponse.getStatus(), httpResponse.body());
                 exchangeCode.setErrorMsg(sb.toString());
             }
+            exchangeCodeRepository.save(exchangeCode);
         } catch (Exception e) {
             log.error("grammarly删除用户网络异常");
         }
