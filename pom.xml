@@ -14,7 +14,7 @@
 	<name>grammarly</name>
 	<description>grammarly business api</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>1.8</java.version>
 		<bootstrap.version>3.3.7</bootstrap.version>
 		<jquery.version>1.12.4</jquery.version>
 		<html5shiv.version>3.7.3</html5shiv.version>

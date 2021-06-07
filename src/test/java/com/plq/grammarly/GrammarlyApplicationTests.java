@@ -95,5 +95,10 @@ class GrammarlyApplicationTests {
 	}
 
 
+	@Test
+	void testListExpire() {
+		List<ExchangeCode> exchangeCodes = exchangeCodeService.listMemberExpire(new Date());
+		System.out.println(exchangeCodes.size());
+	}
 
 }
