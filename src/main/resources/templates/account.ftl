@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>账号管理</title>
+    <title>grammarly账号管理</title>
     <!-- Bootstrap -->
     <link rel="stylesheet" href="${ctx.contextPath}/webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
 
@@ -18,16 +18,17 @@
     <script src="${ctx.contextPath}/webjars/jquery/1.12.4/jquery.min.js"></script>
     <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
     <script src="${ctx.contextPath}/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <!-- 日期控件 -->
     <script src="${ctx.contextPath}/webjars/layer/dist/layer.js"></script>
+    <script src="${ctx.contextPath}/webjars/js-cookie/2.2.1/js.cookie.min.js"></script>
 </head>
 <body>
 <div class="container">
-
+    <div style="text-align: right;">
+        <a class="btn btn-link" href="${ctx.contextPath}/exchangeCode">兑换码管理</a>
+        <button type="button" class="btn btn-link" onclick="logout()">退出登录</button>
+    </div>
     <div style="margin-top: 50px">
         <button type="button" class="btn btn-primary" onclick="add()">新增</button>
-        <!-- 表示一个成功的或积极的动作 -->
-        <button type="button" class="btn btn-success" onclick="toGen()">兑换码生成</button>
     </div>
 
     <table class="table table-bordered">
@@ -130,7 +131,6 @@
         record = {};
     }
     function saveAccount() {
-        debugger;
         let account = $.trim($("#account").val());
         if (account === "") {
             layer.msg("grammarly账号不能为空", function(){});
@@ -176,8 +176,10 @@
             }
         });
     }
-    function toGen() {
-        location.href = "${ctx.contextPath}/exchangeCode/gen";
+    function logout() {
+        Cookies.remove("gp-token");
+        Cookies.remove("gp-username");
+        location.href = "${ctx.contextPath}/login";
     }
 </script>
 </body>

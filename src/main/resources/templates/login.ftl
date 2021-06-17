@@ -18,50 +18,50 @@
     <script src="${ctx.contextPath}/webjars/jquery/1.12.4/jquery.min.js"></script>
     <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
     <script src="${ctx.contextPath}/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <!-- 日期控件 -->
     <script src="${ctx.contextPath}/webjars/layer/dist/layer.js"></script>
+    <script src="${ctx.contextPath}/webjars/js-cookie/2.2.1/js.cookie.min.js"></script>
 </head>
 <body>
 <div class="container">
     <form class="form-horizontal" style="margin-top: 60px;">
         <div class="form-group">
-            <label for="account" class="col-sm-4 control-label"><span style="color: red">*</span>兑换码</label>
+            <label for="account" class="col-sm-4 control-label">用户名</label>
             <div class="col-sm-8">
-                <input type="text" class="form-control" id="number" placeholder="必填项">
+                <input type="text" class="form-control" id="username">
             </div>
         </div>
         <div class="form-group">
-            <label for="account" class="col-sm-4 control-label"><span style="color: red">*</span>邮箱</label>
+            <label for="account" class="col-sm-4 control-label">密码</label>
             <div class="col-sm-8">
-                <input type="email" class="form-control" id="email" placeholder="必填项，接收邮箱">
+                <input type="password" class="form-control" id="password">
             </div>
         </div>
         <div class="form-group">
-            <div class="col-sm-offset-4 col-sm-8">
-                <button type="button" class="btn btn-success" onclick="submitForm()">确 定</button>
+            <div style="text-align: center">
+                <button type="button" class="btn btn-success" onclick="submitForm()">登 陆</button>
             </div>
         </div>
     </form>
 </div>
 <script type="text/javascript">
     function submitForm() {
-        let number = $.trim($("#number").val());
-        if (number === "") {
-            layer.msg("兑换码不能为空", function(){});
+        let username = $.trim($("#username").val());
+        if (username === "") {
+            layer.msg("用户名不能为空", function(){});
             return false;
         }
-        let email = $("#email").val();
-        if (email === "") {
-            layer.msg("邮箱不能为空", function(){});
+        let password = $("#password").val();
+        if (password === "") {
+            layer.msg("密码不能为空", function(){});
             return false;
         }
         let data = {
-            number: number,
-            email: email
+            username: username,
+            password: password
         }
         layer.load();
         $.ajax({
-            url: "${ctx.contextPath}/exchangeCode/exchange",
+            url: "${ctx.contextPath}/api/v1/login",
             type: "post",
             contentType: 'application/json',
             cache: false,
@@ -69,8 +69,10 @@
             data: JSON.stringify(data),
             success: function(res){
                 if (res.code == 200) {
-                    // 兑换成功提示
-                    layer.msg("恭喜您，兑换成功，请前邮箱进行查收", {icon: 1, time: 3000}, function(){
+                    Cookies.set("gp-token", res.data.jwt, { expires: 7 });
+                    Cookies.set("gp-username", res.data.username, { expires: 7 });
+                    layer.msg("登录成功", {icon: 1, time: 3000}, function() {
+                        location.href = "${ctx.contextPath}/exchangeCode";
                     });
                 } else {
                     layer.alert(res.msg, {icon: 5});

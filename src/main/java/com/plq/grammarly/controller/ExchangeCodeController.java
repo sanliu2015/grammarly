@@ -1,21 +1,16 @@
 package com.plq.grammarly.controller;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
-import com.plq.grammarly.model.entity.GrammarlyAccount;
+import com.plq.grammarly.model.vo.ExchangeCodeQueryVO;
 import com.plq.grammarly.model.vo.ExchangeParamVO;
 import com.plq.grammarly.model.vo.GenParamVO;
 import com.plq.grammarly.service.ExchangeCodeService;
-import com.plq.grammarly.service.GrammarlyAccountService;
 import com.plq.grammarly.util.Result;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -40,9 +35,15 @@ public class ExchangeCodeController {
         return "index";
     }
 
-    @GetMapping("/exchangeCode/gen")
-    public String genMng() {
-        return "gen";
+    @GetMapping("/exchangeCode")
+    public String exchangeCode() {
+        return "exchangeCode";
+    }
+
+    @GetMapping("/exchangeCodes")
+    @ResponseBody
+    public Map<String, Object> pageQuery(ExchangeCodeQueryVO exchangeCodeQueryVO) {
+        return exchangeCodeService.pageQuery(exchangeCodeQueryVO);
     }
 
     /**

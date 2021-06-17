@@ -19,7 +19,7 @@ import java.io.Serializable;
 public class User implements Serializable {
 
     @Id
-    private int id;
+    private String id;
     private String username;
     private String password;
     private Boolean active;

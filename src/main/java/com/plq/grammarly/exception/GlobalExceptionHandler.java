@@ -16,6 +16,7 @@ import javax.validation.ConstraintViolationException;
 import com.plq.grammarly.util.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -146,12 +147,29 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
+    /**
+     * 登录异常
+     * @param request 请求
+     * @param badCredentialsException 异常
+     * @return Result code 500
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseBody
+    public Result otherException(HttpServletRequest request, BadCredentialsException badCredentialsException) {
+        log.error("异常:" + request.getRequestURI(), badCredentialsException);
+        return Result.builder()
+                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .msg("用户名或者密码错误")
+                .data(getExceptionDetail(badCredentialsException))
+                .build();
+    }
+
 
     /**
      * 其他异常
      * @param request 请求
      * @param exception 异常
-     * @return Result code 400
+     * @return Result code 500
      */
     @ExceptionHandler(Exception.class)
     @ResponseBody

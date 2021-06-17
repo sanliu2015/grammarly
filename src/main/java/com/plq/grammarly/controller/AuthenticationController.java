@@ -5,6 +5,7 @@ import com.plq.grammarly.model.AuthenticationResponse;
 import com.plq.grammarly.model.MyUserDetails;
 import com.plq.grammarly.service.impl.UserServiceImpl;
 import com.plq.grammarly.util.JwtUtil;
+import com.plq.grammarly.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,14 +13,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@RestController
+@Controller
 public class AuthenticationController {
 
 	@Autowired
@@ -31,18 +35,20 @@ public class AuthenticationController {
 	@Autowired
 	private UserServiceImpl userDetailsService;
 
-	@PostMapping(value = "/login")
+	@GetMapping("/login")
+	public String login() {
+		return "login";
+	}
+
+	@PostMapping(value = "/api/v1/login")
+	@ResponseBody
 	// @CrossOrigin
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
-	HttpHeaders responseHeaders = new HttpHeaders();
-		
+    public Result createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
 		Authentication authenticate = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword())
 		);
-
 		//if authentication was succesful else throw an exception
-		final MyUserDetails userDetails = (MyUserDetails) userDetailsService
-			.loadUserByUsername(authenticationRequest.getUsername());
+		final MyUserDetails userDetails = (MyUserDetails) authenticate.getPrincipal();
 		final String jwt = jwtTokenUtil.generateToken(userDetails);
 		AuthenticationResponse response = new AuthenticationResponse(jwt);
 
@@ -52,8 +58,8 @@ public class AuthenticationController {
 		userDetails.getAuthorities().forEach((a) -> roles.add(a.getAuthority()));
 		response.setRoles(roles);
 
-		return new ResponseEntity<>(response, responseHeaders, HttpStatus.OK);
-	
+		return Result.success(response);
+
 	}
 	
 }

@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.Optional;
 
 /**
@@ -30,5 +31,21 @@ public class UserServiceImpl implements UserDetailsService {
         Optional<User> user = userRepository.findByUsername(username);
         user.orElseThrow(() -> new UsernameNotFoundException("Not found: " + username));
         return user.map(MyUserDetails::new).get();
+    }
+
+    /**
+     * 初始化用户
+     */
+    @PostConstruct
+    public void initUserinfo() {
+        Optional<User> user = userRepository.findByUsername("admin");
+        if (!user.isPresent()) {
+            User newUser = User.builder()
+                    .username("admin")
+                    .password("$2a$10$SH8NR.SXX6fGJiDxa2RsLO326bAVxaihQppa8HH1fipREHaobLn2W")
+                    .roles("ROLE_ADMIN")
+                    .active(true).build();
+            userRepository.insert(newUser);
+        }
     }
 }

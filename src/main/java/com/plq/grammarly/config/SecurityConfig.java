@@ -54,11 +54,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.cors().disable().csrf().disable()
-                .authorizeRequests().antMatchers("/login", "/exchangeCode/exchange", "/index", "/").permitAll().
+                .authorizeRequests()
+                .antMatchers("/login", "/api/v1/login", "/webjars/**", "/exchangeCode/exchange", "/index", "/").permitAll().
                 anyRequest().authenticated()
-                .and().
-                exceptionHandling().
-                and().sessionManagement()
+                .and()
+                .formLogin()
+                .loginPage("/login")                      //登陆页面
+                .successForwardUrl("/exchangeCode/gen")
+                .and().exceptionHandling()
+                .and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         httpSecurity.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }

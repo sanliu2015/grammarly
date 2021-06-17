@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class MyUserDetails implements UserDetails {
 
 	private static final long serialVersionUID = 275347623L;
-	private int id;
+	private String id;
 	private String username;
     private String password;
     private Boolean active;
@@ -88,11 +88,11 @@ public class MyUserDetails implements UserDetails {
         return active;
     }
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 }

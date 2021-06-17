@@ -1,5 +1,6 @@
 package com.plq.grammarly.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpRequest;
@@ -9,6 +10,7 @@ import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Lists;
 import com.plq.grammarly.model.entity.ExchangeCode;
 import com.plq.grammarly.model.entity.GrammarlyAccount;
+import com.plq.grammarly.model.vo.ExchangeCodeQueryVO;
 import com.plq.grammarly.model.vo.ExchangeParamVO;
 import com.plq.grammarly.model.vo.GenParamVO;
 import com.plq.grammarly.repository.ExchangeCodeRepository;
@@ -18,6 +20,10 @@ import com.plq.grammarly.util.BizUtil;
 import com.plq.grammarly.util.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -89,7 +95,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
             }
             if (exchangeCode.getExchangeDeadline() != null) {
                 if (DateUtil.compare(exchangeCode.getExchangeDeadline(), new Date()) < 0) {
-                    return Result.failure("此兑换码已经过了截止兑换日期：" + DateUtil.format(exchangeCode.getExchangeDeadline(), "yyyyMMdd"));
+                    return Result.failure("此兑换码已超过兑换截止日期：" + DateUtil.format(exchangeCode.getExchangeDeadline(), "yyyyMMdd"));
                 }
             }
             exchangeCode.setEmail(exchangeParamVO.getEmail());
@@ -203,5 +209,27 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
     @Override
     public List<ExchangeCode> listMemberExpire(Date date) {
         return exchangeCodeRepository.findByExchangeStatusTrueAndRemoveStatusFalseAndMemberDeadlineLessThan(date);
+    }
+
+    @Override
+    public Map<String, Object> pageQuery(ExchangeCodeQueryVO exchangeCodeQueryVO) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        PageRequest pageRequest = PageRequest.of(exchangeCodeQueryVO.getPage() - 1, exchangeCodeQueryVO.getLimit(), sort);
+        ExchangeCode exchangeCode = new ExchangeCode();
+        BeanUtil.copyProperties(exchangeCodeQueryVO, exchangeCode);
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withStringMatcher(ExampleMatcher.StringMatcher.EXACT)
+                .withMatcher("email", ExampleMatcher.GenericPropertyMatchers.ignoreCase().contains());
+//        if (exchangeCodeQueryVO.getMemberDeadlineStart() != null) {
+//            matcher.withMatcher("memberDeadline", ExampleMatcher.)
+//        }
+        Example example = Example.of(exchangeCode, matcher);
+        Page page = exchangeCodeRepository.findAll(example, pageRequest);
+        Map<String, Object> result = new HashMap<>();
+        result.put("data", page.getContent());
+        result.put("count", page.getTotalElements());
+        result.put("code", 0);
+        result.put("msg", "");
+        return result;
     }
 }

@@ -2,9 +2,11 @@ package com.plq.grammarly.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.plq.grammarly.model.entity.ExchangeCode;
+import com.plq.grammarly.model.vo.ExchangeCodeQueryVO;
 import com.plq.grammarly.model.vo.ExchangeParamVO;
 import com.plq.grammarly.model.vo.GenParamVO;
 import com.plq.grammarly.util.Result;
@@ -39,4 +41,6 @@ public interface ExchangeCodeService {
     boolean remove(ExchangeCode exchangeCode);
 
     List<ExchangeCode> listMemberExpire(Date now);
+
+    Map<String, Object> pageQuery(ExchangeCodeQueryVO exchangeCodeQueryVO);
 }

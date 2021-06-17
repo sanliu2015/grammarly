@@ -8,6 +8,7 @@
     <!-- Bootstrap -->
     <link rel="stylesheet" href="${ctx.contextPath}/webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
     <link rel="stylesheet" href="${ctx.contextPath}/webjars/Eonasdan-bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" />
+    <link rel="stylesheet" href="//unpkg.com/layui@2.6.8/dist/css/layui.css">
 
     <!-- HTML5 shim 和 Respond.js 是为了让 IE8 支持 HTML5 元素和媒体查询（media queries）功能 -->
     <!-- 警告：通过 file:// 协议（就是直接将 html 页面拖拽到浏览器中）访问页面时 Respond.js 不起作用 -->
@@ -22,10 +23,17 @@
     <!-- 日期控件 -->
     <script src="${ctx.contextPath}/webjars/momentjs/2.10.3/min/moment-with-locales.min.js"></script>
     <script src="${ctx.contextPath}/webjars/Eonasdan-bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
-    <script src="${ctx.contextPath}/webjars/layer/dist/layer.js"></script>
+    <script src="${ctx.contextPath}/webjars/js-cookie/2.2.1/js.cookie.min.js"></script>
+    <script src="//unpkg.com/layui@2.6.8/dist/layui.js"></script>
 </head>
 <body>
 <div class="container">
+    <div style="text-align: right;">
+        <a class="btn btn-link" href="${ctx.contextPath}/grammarlyAccounts">账户管理</a>
+        <button type="button" class="btn btn-link" onclick="logout()">退出登录</button>
+    </div>
+    <div style="margin-top: 60px;"></div>
+    <table class="layui-hide" id="test"></table>
     <form class="form-horizontal" style="margin-top: 60px;">
         <div class="form-group">
             <label for="account" class="col-sm-4 control-label"><span style="color: red">*</span>生成数量（单位：个）</label>
@@ -66,6 +74,27 @@
 
 </div>
 <script type="text/javascript">
+    layui.use(['layer', 'table'], function(){
+        var layer = layui.layer
+            ,table = layui.table;
+
+        table.render({
+            elem: '#test'
+            ,url:'${ctx.contextPath}/exchangeCodes'
+            ,cols: [[
+                 {field:'id', width:80, title: 'ID', hide: true}
+                ,{field:'number', width:80, title: '兑换码'}
+                ,{field:'createTime', width:180, title: '生成时间'}
+                ,{field:'exchangeStatus', width:100, title: '是否兑换'}
+                ,{field:'exchangeTime', width:180, title: '兑换时间'}
+                ,{field:'email', minWidth: 200, title: '兑换邮箱'}
+                ,{field:'memberDeadline', title: '到期日期', minWidth: 150}
+                ,{field:'expireStatus', width:100, title: '是否到期'}
+                ,{field:'removeStatus', width:100, title: '是否删除'}
+            ]]
+            ,page: true
+        });
+    });
     var options = {
         format: 'YYYY-MM-DD',
         showClear: true,  //清除按钮
@@ -129,6 +158,11 @@
                 layer.closeAll('loading');
             }
         });
+    }
+    function logout() {
+        Cookies.remove("gp-token");
+        Cookies.remove("gp-username");
+        location.href = "${ctx.contextPath}/login";
     }
 </script>
 </body>

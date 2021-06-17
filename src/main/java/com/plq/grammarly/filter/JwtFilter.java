@@ -1,5 +1,6 @@
 package com.plq.grammarly.filter;
 
+import com.google.common.collect.Maps;
 import com.plq.grammarly.service.impl.UserServiceImpl;
 import com.plq.grammarly.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -28,24 +32,32 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-
-        final String authorizationHeader = request.getHeader("Authorization");
-
-        String username = null;
         String jwt = null;
-
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
-            username = jwtUtil.extractUsername(jwt);
+        String username = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            Map<String,Cookie> cookieMap = Maps.newHashMapWithExpectedSize(cookies.length);
+            for (Cookie cookie : cookies) {
+                cookieMap.put(cookie.getName(), cookie);
+            }
+            if (cookieMap.containsKey("gp-token")) {
+                jwt = cookieMap.get("gp-token").getValue();
+            }
+            if (cookieMap.containsKey("gp-username")) {
+                username = cookieMap.get("gp-username").getValue();
+            }
         }
+
+//        final String authorizationHeader = request.getHeader("Authorization");
+//        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+//            jwt = authorizationHeader.substring(7);
+//            username = jwtUtil.extractUsername(jwt);
+//        }
 
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-
             if (jwtUtil.validateToken(jwt, userDetails)) {
-
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 usernamePasswordAuthenticationToken
