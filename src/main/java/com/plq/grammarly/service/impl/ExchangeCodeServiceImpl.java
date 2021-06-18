@@ -218,8 +218,10 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
         ExchangeCode exchangeCode = new ExchangeCode();
         BeanUtil.copyProperties(exchangeCodeQueryVO, exchangeCode);
         ExampleMatcher matcher = ExampleMatcher.matching()
-                .withStringMatcher(ExampleMatcher.StringMatcher.EXACT)
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
+                .withMatcher("number", ExampleMatcher.GenericPropertyMatchers.exact())
                 .withMatcher("email", ExampleMatcher.GenericPropertyMatchers.ignoreCase().contains());
+//                .withMatcher("email", ExampleMatcher.GenericPropertyMatchers.ignoreCase().contains()); // 模糊搜索
 //        if (exchangeCodeQueryVO.getMemberDeadlineStart() != null) {
 //            matcher.withMatcher("memberDeadline", ExampleMatcher.)
 //        }

@@ -12,3 +12,7 @@ spring:
             password: 4qlPi9zeL1dqhtJ8
             auto-index-creation: true
 #            uri: "mongodb://root:4qlPi9zeL1dqhtJ8@121.4.232.40:27017/grammarly?ssl=false"
+
+logging:
+    level:
+      org.springframework.data.mongodb.core: DEBUG

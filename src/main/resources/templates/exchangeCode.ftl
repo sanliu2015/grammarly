@@ -36,11 +36,11 @@
     <div class="demoTable">
         兑换码：
         <div class="layui-inline">
-            <input class="layui-input" name="number" id="number" autocomplete="off">
+            <input class="layui-input" placeholder="精确匹配" name="number" id="number" autocomplete="off">
         </div>
         邮箱：
         <div class="layui-inline">
-            <input class="layui-input" name="email" id="email" autocomplete="off">
+            <input class="layui-input" placeholder="模糊匹配" name="email" id="email" autocomplete="off">
         </div>
         <button class="layui-btn" data-type="reload">搜索</button>
     </div>
@@ -109,24 +109,27 @@
             ,table = layui.table;
         var $ = layui.$, active = {
             reload: function(){
-                var number = $('#number');
-                var email = $('#email');
-                //执行重载
+                var whereObj = {};
+                var number = $.trim($('#number').val());
+                var email = $.trim($('#email').val());
+                if (number != "") {
+                    whereObj.number = number;
+                }
+                if (email != "") {
+                    whereObj.email = email;
+                }
+                // 执行重载,重新从第 1 页开始
                 table.reload('test', {
                     page: {
-                        curr: 1 //重新从第 1 页开始
+                        curr: 1,
+                        limit: ins1.config.limit
                     }
-                    ,where: {
-                        key: {
-                            number: number.val(),
-                            email: email.val()
-                        }
-                    }
+                    ,where: whereObj
                 });
             }
         };
 
-        table.render({
+       var ins1 = table.render({
             elem: '#test'
             ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
             ,url:'${ctx.contextPath}/exchangeCodes'
