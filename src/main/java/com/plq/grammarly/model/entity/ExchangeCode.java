@@ -1,5 +1,6 @@
 package com.plq.grammarly.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,6 +41,7 @@ public class ExchangeCode implements Serializable {
     /**
      * 兑换截止时间，产生1个兑换码，必须在最后期限之前兑换
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date exchangeDeadline;
 
     /**
