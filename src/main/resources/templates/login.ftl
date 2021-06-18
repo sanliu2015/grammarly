@@ -71,7 +71,7 @@
                 if (res.code == 200) {
                     Cookies.set("gp-token", res.data.jwt, { expires: 7 });
                     Cookies.set("gp-username", res.data.username, { expires: 7 });
-                    layer.msg("登录成功", {icon: 1, time: 3000}, function() {
+                    layer.msg("登录成功，正在跳转...", {icon: 1, time: 1000}, function() {
                         location.href = "${ctx.contextPath}/exchangeCode";
                     });
                 } else {
