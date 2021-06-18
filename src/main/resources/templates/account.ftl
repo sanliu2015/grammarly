@@ -25,6 +25,7 @@
 <div class="container">
     <div style="text-align: right;">
         <a class="btn btn-link" href="${ctx.contextPath}/exchangeCode">兑换码管理</a>
+        <button type="button" class="btn btn-link" onclick="modifyPwd()">修改登录密码</button>
         <button type="button" class="btn btn-link" onclick="logout()">退出登录</button>
     </div>
     <div style="margin-top: 50px">
@@ -180,6 +181,39 @@
         Cookies.remove("gp-token");
         Cookies.remove("gp-username");
         location.href = "${ctx.contextPath}/login";
+    }
+    function modifyPwd() {
+        layer.prompt({
+            formType: 0,
+            title: '修改密码',
+        },function(val, index){
+            $.ajax({
+                url: "${ctx.contextPath}/grammarlyAccount/modifyPwd",
+                type: "put",
+                contentType: 'application/json',
+                cache: false,
+                dataType: "json",
+                data: JSON.stringify({
+                    username: Cookies.get("username"),
+                    password: val
+                }),
+                success: function(res){
+                    if (res.code == 200) {
+                        layer.msg('修改密码成功，请您退出重登!', {icon: 1, time: 2000}, function(){
+                        });
+                        layer.close(index);
+                    } else {
+                        layer.alert(res.msg, {icon: 5});
+                    }
+                },
+                error:function(res) {
+                    layer.alert(res.responseJSON.message, {icon: 5});
+                },
+                complete: function () {
+                    layer.closeAll('loading');
+                }
+            });
+        });
     }
 </script>
 </body>

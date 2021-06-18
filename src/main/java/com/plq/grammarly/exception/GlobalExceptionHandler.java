@@ -155,12 +155,28 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseBody
-    public Result otherException(HttpServletRequest request, BadCredentialsException badCredentialsException) {
+    public Result badCredentialsException(HttpServletRequest request, BadCredentialsException badCredentialsException) {
         log.error("异常:" + request.getRequestURI(), badCredentialsException);
         return Result.builder()
                 .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .msg("用户名或者密码错误")
                 .data(getExceptionDetail(badCredentialsException))
+                .build();
+    }
+
+    /**
+     * 登录异常
+     * @param request 请求
+     * @param customException 异常
+     * @return Result code 500
+     */
+    @ExceptionHandler(CustomException.class)
+    @ResponseBody
+    public Result customException(HttpServletRequest request, CustomException customException) {
+        log.error("customException异常:" + request.getRequestURI(), customException);
+        return Result.builder()
+                .code(customException.getCode())
+                .msg(customException.getMessage())
                 .build();
     }
 
