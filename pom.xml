@@ -154,6 +154,7 @@
 				<filtering>true</filtering>
 				<includes>
 					<include>**/*.ftl</include>
+					<include>logback-spring.xml</include>
 					<!-- 项目打包完成的包中只包含当前环境文件 -->
 					<include>application.yml</include>
 					<!--suppress UnresolvedMavenProperty -->
