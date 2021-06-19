@@ -1,0 +1,17 @@
+server:
+    port: 8899
+
+spring:
+    data:
+        mongodb:
+            host: localhost
+            port: 27017
+            database: grammarly
+#            username: root
+#            authentication-database: admin
+#            password: 4qlPi9zeL1dqhtJ8
+            auto-index-creation: true
+
+logging:
+    level:
+      org.springframework.data.mongodb.core: DEBUG

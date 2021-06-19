@@ -1,0 +1,8 @@
+server:
+    port: 8899
+
+spring:
+    data:
+        mongodb:
+            database: grammarly
+            auto-index-creation: true

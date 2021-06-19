@@ -1,0 +1,30 @@
+# Tomcat
+server:
+  tomcat:
+    uri-encoding: UTF-8
+    threads:
+      max: 100
+      min-spare: 5
+  servlet:
+    context-path: /grammarly
+
+spring:
+  application:
+    name: grammarly-plugin
+  profiles:
+    active: @spring.profiles.active@
+  # jackson\u65F6\u95F4\u683C\u5F0F\u5316
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+    default-property-inclusion: non_null
+  freemarker:
+    # 通用请求头，配合freemarker的request-context-attribute属性使用，通过${ctx.contextPath}获取该配置文件的上下文路径（也可以通过这种方式定义请求头）
+    request-context-attribute: ctx
+    charset: utf-8
+    check-template-location: true
+    content-type: text/html
+    enabled: true
+    suffix: .ftl
+    template-loader-path: classpath:/templates #配置模板所在目录
+
