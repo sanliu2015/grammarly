@@ -4,15 +4,14 @@ server:
 spring:
     data:
         mongodb:
-            host: 121.4.232.40
+            host: localhost
             port: 27017
             database: grammarly
-            username: root
-            authentication-database: admin
-            password: 4qlPi9zeL1dqhtJ8
+#            username: root
+#            authentication-database: admin
+#            password: 4qlPi9zeL1dqhtJ8
             auto-index-creation: true
-#            uri: "mongodb://root:4qlPi9zeL1dqhtJ8@121.4.232.40:27017/grammarly?ssl=false"
 
 logging:
     level:
-      org.springframework.data.mongodb.core: DEBUG
+        org.springframework.data.mongodb.core: DEBUG
