@@ -9,6 +9,7 @@ import com.plq.grammarly.service.impl.UserServiceImpl;
 import com.plq.grammarly.util.Result;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -68,6 +69,13 @@ public class GrammarlyAccountController {
     public Result getAccount(@PathVariable String id) {
         GrammarlyAccount grammarlyAccount = grammarlyAccountService.findById(id);
         return Result.success(grammarlyAccount);
+    }
+
+    @DeleteMapping("/grammarlyAccount/{id}")
+    @ResponseBody
+    public Result delAccount(@PathVariable String id) {
+        grammarlyAccountService.deleteById(id);
+        return Result.success();
     }
 
     @PutMapping("/grammarlyAccount/modifyPwd")

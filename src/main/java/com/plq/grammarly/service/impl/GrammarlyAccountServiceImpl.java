@@ -53,4 +53,9 @@ public class GrammarlyAccountServiceImpl implements GrammarlyAccountService {
     public GrammarlyAccount findById(String id) {
         return grammarlyAccountRepository.findById(id).orElse(new GrammarlyAccount());
     }
+
+    @Override
+    public void deleteById(String id) {
+        grammarlyAccountRepository.deleteById(id);
+    }
 }

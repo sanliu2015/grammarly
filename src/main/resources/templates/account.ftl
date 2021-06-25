@@ -53,6 +53,7 @@
                     <div>
                         <button type="button" class="btn btn-link" onclick="add()">添加</button>
                         <button type="button" class="btn btn-link" onclick="edit('${item.id}')">编辑</button>
+                        <button type="button" class="btn btn-link" onclick="remove('${item.id}')">删除</button>
                     </div>
                 </th>
             </tr>
@@ -214,6 +215,31 @@
                 }
             });
         });
+    }
+    function remove(id) {
+        layer.load();
+        $.ajax({
+            url: "${ctx.contextPath}/grammarlyAccount/" + id,
+            type: "delete",
+            cache: false,
+            dataType: "json",
+            success: function(res){
+                if (res.code == 200) {
+                    layer.msg('删除成功!', {icon: 1, time: 2000}, function(){
+                        location.reload();
+                    });
+                } else {
+                    layer.alert(res.msg, {icon: 5});
+                }
+            },
+            error:function(res) {
+                layer.alert(res.responseJSON.message, {icon: 5});
+            },
+            complete: function () {
+                layer.closeAll('loading');
+            }
+        });
+
     }
 </script>
 </body>

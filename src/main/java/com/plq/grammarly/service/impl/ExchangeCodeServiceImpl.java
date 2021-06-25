@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -120,7 +121,15 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
             log.error("优先根据会员天数{}对应分类没找到grammarly账号配置，故查找所有分类配置", exchangeCode.getValidDays());
             accounts = grammarlyAccountService.listAll();
         }
-        Collections.shuffle(accounts);
+//        Collections.shuffle(accounts);    // 随机排序
+        // 创建时间降序
+        Collections.sort(accounts, (o1, o2) -> {
+            int i = o2.getCreateTime().compareTo(o1.getCreateTime());
+            if (i == 0) {
+                return o2.getId().compareTo(o1.getId());
+            }
+            return i;
+        });
         boolean successFlag = false;
         log.info("用户开始兑换{},所填邮箱:{},候选grammarly账号数:{}", exchangeCode.getNumber(), exchangeCode.getEmail(), accounts);
         if (accounts.size() > 0) {

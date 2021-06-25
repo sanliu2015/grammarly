@@ -21,4 +21,6 @@ public interface GrammarlyAccountService {
     void save(GrammarlyAccount grammarlyAccount);
 
     GrammarlyAccount findById(String id);
+
+    void deleteById(String id);
 }
