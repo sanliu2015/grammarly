@@ -199,6 +199,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                 exchangeCode.setRemoveTime(new Date());
                 exchangeCode.setErrorMsg("");
                 flag = true;
+                log.info("grammarly删除用户成功，exchangeCode：{}", exchangeCode);
             } else {
                 StringBuilder sb = new StringBuilder(exchangeCode.getErrorMsg() == null ? "" : exchangeCode.getErrorMsg());
                 sb.append("grammarly账号：").append(grammarlyAccount.getAccount())

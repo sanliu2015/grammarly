@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-@Profile("dev")
+@Profile("uat")
 @SpringBootTest
 class GrammarlyApplicationTests {
 
@@ -37,6 +37,12 @@ class GrammarlyApplicationTests {
 
 	@Test
 	void contextLoads() {
+		ExchangeCode exchangeCode = new ExchangeCode();
+		exchangeCode.setNumber(RandomUtil.randomString(16));
+		exchangeCode.setExchangeStatus(true);
+		exchangeCode.setRemoveStatus(false);
+		exchangeCode.setMemberDeadline(DateUtil.beginOfDay(new Date()));
+		System.out.println(exchangeCode);
 	}
 
 	@Test
