@@ -164,9 +164,9 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                                exchangeCode.getEmail(), httpResponse.getStatus(), httpResponse.body());
                        exchangeCode.setErrorMsg(sb.toString());
                    }
-                    exchangeCodeRepository.save(exchangeCode);
+                   exchangeCodeRepository.save(exchangeCode);
                 } catch (Exception e) {
-                    log.error("grammarly邀请用户网络异常");
+                    log.error("grammarly邀请用户网络异常", e);
                 }
             }
         } else {
@@ -185,6 +185,9 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
     public boolean remove(ExchangeCode exchangeCode) {
         boolean flag = false;
         GrammarlyAccount grammarlyAccount = grammarlyAccountService.findByAccount(exchangeCode.getInviterAccount());
+        if (grammarlyAccount == null) {
+            log.error("兑换码{}对应的邀请方账号{}详细信息没找到", exchangeCode.getNumber(), exchangeCode.getInviterAccount());
+        }
         Map<String, String> httpRequestHeadMap = BizUtil.convertFromCurl(grammarlyAccount.getCurlStr());
         HttpRequest httpRequest = BizUtil.buildRemoveHttpRequest(httpRequestHeadMap);
         Map<String, Object> map = new HashMap<>(16);
@@ -211,7 +214,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
             }
             exchangeCodeRepository.save(exchangeCode);
         } catch (Exception e) {
-            log.error("grammarly删除用户网络异常");
+            log.error("grammarly删除用户网络异常", e);
         }
         return flag;
     }

@@ -75,7 +75,7 @@ public class GrammarlyTask {
                 exchangeCodeService.remove(exchangeCode);
             }
         } catch (Exception e) {
-            log.error("定时删除过期任务出现异常");
+            log.error("定时删除过期任务出现异常", e);
         }
     }
 
