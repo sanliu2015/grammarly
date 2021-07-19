@@ -187,6 +187,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
         GrammarlyAccount grammarlyAccount = grammarlyAccountService.findByAccount(exchangeCode.getInviterAccount());
         if (grammarlyAccount == null) {
             log.error("兑换码{}对应的邀请方账号{}详细信息没找到", exchangeCode.getNumber(), exchangeCode.getInviterAccount());
+            return false;
         }
         Map<String, String> httpRequestHeadMap = BizUtil.convertFromCurl(grammarlyAccount.getCurlStr());
         HttpRequest httpRequest = BizUtil.buildRemoveHttpRequest(httpRequestHeadMap);

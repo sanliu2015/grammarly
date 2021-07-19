@@ -9,7 +9,10 @@ import com.plq.grammarly.model.vo.GenParamVO;
 import com.plq.grammarly.repository.ExchangeCodeRepository;
 import com.plq.grammarly.repository.GrammarlyAccountRepository;
 import com.plq.grammarly.service.ExchangeCodeService;
+import com.plq.grammarly.service.GrammarlyAccountService;
 import com.plq.grammarly.task.GrammarlyTask;
+import com.plq.grammarly.util.BizUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,14 +23,18 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-@Profile("uat")
+@Profile("dev")
 @SpringBootTest
+@Slf4j
 class GrammarlyApplicationTests {
 
 	@Autowired
 	private ExchangeCodeService exchangeCodeService;
+	@Autowired
+	private GrammarlyAccountService grammarlyAccountService;
 	@Autowired
 	private ExchangeCodeRepository exchangeCodeRepository;
 	@Autowired
@@ -104,7 +111,33 @@ class GrammarlyApplicationTests {
 	@Test
 	void testListExpire() {
 		List<ExchangeCode> exchangeCodes = exchangeCodeService.listMemberExpire(new Date());
+		for (ExchangeCode exchangeCode : exchangeCodes) {
+			try {
+				GrammarlyAccount grammarlyAccount = grammarlyAccountService.findByAccount(exchangeCode.getInviterAccount());
+				if (grammarlyAccount == null) {
+					log.error("兑换码{}对应的邀请方账号{}详细信息没找到", exchangeCode.getNumber(), exchangeCode.getInviterAccount());
+				}
+				Map<String, String> httpRequestHeadMap = BizUtil.convertFromCurl(grammarlyAccount.getCurlStr());
+			} catch (Exception e) {
+				log.error("exchange:{}", exchangeCode);
+				e.printStackTrace();
+			}
+
+		}
 		System.out.println(exchangeCodes.size());
+	}
+
+	@Test
+	void testGrammarlyAccount() {
+		List<GrammarlyAccount> accounts = grammarlyAccountRepository.findAll();
+		for (GrammarlyAccount grammarlyAccount : accounts) {
+			try {
+				Map<String, String> httpRequestHeadMap = BizUtil.convertFromCurl(grammarlyAccount.getCurlStr());
+			} catch (Exception e) {
+				System.out.println(grammarlyAccount);
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

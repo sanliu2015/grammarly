@@ -4,7 +4,7 @@ server:
 spring:
     data:
         mongodb:
-            host: localhost
+            host: 172.16.21.6
             port: 27017
             database: grammarly
 #            username: root
