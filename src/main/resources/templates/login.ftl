@@ -44,6 +44,13 @@
     </form>
 </div>
 <script type="text/javascript">
+    $(function () {
+        $('#password').keydown(function(e){
+            if(e.keyCode==13){
+                submitForm(); //处理事件
+            }
+        });
+    })
     function submitForm() {
         let username = $.trim($("#username").val());
         if (username === "") {
