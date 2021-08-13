@@ -1,8 +1,10 @@
 package com.plq.grammarly.controller;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
+import com.plq.grammarly.model.entity.ExchangeCode;
 import com.plq.grammarly.model.vo.ExchangeCodeQueryVO;
 import com.plq.grammarly.model.vo.ExchangeParamVO;
 import com.plq.grammarly.model.vo.GenParamVO;
@@ -10,8 +12,11 @@ import com.plq.grammarly.service.ExchangeCodeService;
 import com.plq.grammarly.util.Result;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -69,6 +74,33 @@ public class ExchangeCodeController {
         return exchangeCodeService.exchange(exchangeParamVO);
     }
 
+    /**
+     * 删除会员
+     * @param id
+     * @return
+     */
+    @PutMapping("/exchangeCode/{id}/removeMember")
+    @ResponseBody
+    public Result removeRember(@PathVariable String id) {
+        ExchangeCode exchangeCode = exchangeCodeService.getObjById(id);
+        boolean result = exchangeCodeService.remove(exchangeCode);
+        return Result.success(result);
+    }
 
+    /**
+     * 修改删除状态
+     * @param id
+     * @param removeStatus
+     * @return
+     */
+    @PutMapping("/exchangeCode/{id}/removeStatus/{removeStatus}")
+    @ResponseBody
+    public Result updateRemoveStatus(@PathVariable String id, @PathVariable Boolean removeStatus) {
+        ExchangeCode exchangeCode = exchangeCodeService.getObjById(id);
+        exchangeCode.setRemoveStatus(removeStatus);
+        exchangeCode.setRemoveTime(new Date());
+        exchangeCodeService.updateObj(exchangeCode);
+        return Result.success();
+    }
 
 }

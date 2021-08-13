@@ -248,4 +248,14 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
         result.put("msg", "");
         return result;
     }
+
+    @Override
+    public ExchangeCode getObjById(String id) {
+        return exchangeCodeRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public void updateObj(ExchangeCode exchangeCode) {
+        exchangeCodeRepository.save(exchangeCode);
+    }
 }

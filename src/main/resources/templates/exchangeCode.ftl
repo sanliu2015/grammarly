@@ -49,6 +49,10 @@
             <button class="layui-btn layui-btn-sm" onclick="gen()">产生兑换码</button>
         </div>
     </script>
+    <script type="text/html" id="rowBar">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">变更状态</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除会员</a>
+    </script>
     <table class="layui-hide" id="test" lay-filter="test"></table>
 
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
@@ -134,7 +138,8 @@
             ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
             ,url:'${ctx.contextPath}/exchangeCodes'
             ,cols: [[
-                 {type: 'numbers', title: '序号', width: 40, fixed: 'left' }//序号列
+                 {type: 'checkbox', fixed: 'left'}
+                ,{type: 'numbers', title: '序号', width: 40, fixed: 'left' }//序号列
                 ,{field:'id', width:80, title: 'ID', hide: true, fixed: 'left' }
                 ,{field:'number', width:160, title: '兑换码', fixed: 'left' }
                 ,{field:'createTime', width:180, title: '生成时间'}
@@ -145,9 +150,81 @@
                 ,{field:'memberDeadline', title: '到期日期', minWidth: 150}
                 ,{field:'expireStatus', width:90, title: '是否到期'}
                 ,{field:'removeStatus', width:90, title: '是否删除'}
+                ,{field:'inviterAccount', width:200, title: '邀请者账号'}
+                ,{fixed: 'right', title:'操作', toolbar: '#rowBar', width:160}
             ]]
             ,page: true
             ,limits: [10,20,50,100]
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function(obj){
+            var data = obj.data;
+            //console.log(obj)
+            if(obj.event === 'del'){
+                layer.confirm('确定删除会员吗', function(index){
+                    layer.load();
+                    $.ajax({
+                        url: "${ctx.contextPath}/exchangeCode/" + data.id + "/removeMember",
+                        type: "put",
+                        contentType: 'application/json',
+                        cache: false,
+                        dataType: "json",
+                        success: function(res){
+                            if (res.code == 200) {
+                                debugger;
+                                if (res.data) {
+                                    layer.msg('删除会员操作成功!', {icon: 1, time: 1000}, function(){
+                                        $('.demoTable .layui-btn').trigger("click");
+                                    });
+                                } else {
+                                    layer.alert('删除会员失败，详见后台日志，您也可以尝试变更状态（前提grammarly账号下移除过该用户邮箱或已失效）', {icon: 5, time: 5000});
+                                }
+                            } else {
+                                layer.alert(res.msg, {icon: 5});
+                            }
+                        },
+                        error:function(res) {
+                            layer.alert(res.responseJSON.message, {icon: 5});
+                        },
+                        complete: function () {
+                            layer.closeAll('loading');
+                        }
+                    });
+                    layer.close(index);
+                });
+            } else if(obj.event === 'edit'){
+                layer.prompt({
+                    formType: 2
+                    ,value: !data.removeStatus
+                }, function(value, index){
+                    layer.load();
+                    $.ajax({
+                        url: "${ctx.contextPath}/exchangeCode/" + data.id + "/removeStatus/" + value,
+                        type: "put",
+                        contentType: 'application/json',
+                        cache: false,
+                        dataType: "json",
+                        success: function(res){
+                            debugger;
+                            if (res.code == 200) {
+                                layer.msg('变更状态操作成功!', {icon: 1, time: 1000}, function(){
+                                    $('.demoTable .layui-btn').trigger("click");
+                                });
+                            } else {
+                                layer.alert(res.msg, {icon: 5});
+                            }
+                        },
+                        error:function(res) {
+                            layer.alert(res.responseJSON.message, {icon: 5});
+                        },
+                        complete: function () {
+                            layer.closeAll('loading');
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
         });
 
         $('.demoTable .layui-btn').on('click', function(){

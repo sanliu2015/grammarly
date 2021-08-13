@@ -43,4 +43,8 @@ public interface ExchangeCodeService {
     List<ExchangeCode> listMemberExpire(Date now);
 
     Map<String, Object> pageQuery(ExchangeCodeQueryVO exchangeCodeQueryVO);
+
+    ExchangeCode getObjById(String id);
+
+    void updateObj(ExchangeCode exchangeCode);
 }
