@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.plq.grammarly.model.entity.ExchangeCode;
+import com.plq.grammarly.model.entity.GrammarlyAccount;
 import com.plq.grammarly.model.vo.ExchangeCodeQueryVO;
 import com.plq.grammarly.model.vo.ExchangeParamVO;
 import com.plq.grammarly.model.vo.GenParamVO;
@@ -49,4 +50,6 @@ public interface ExchangeCodeService {
     void updateObj(ExchangeCode exchangeCode);
 
     void delete(ExchangeCode exchangeCode);
+
+    boolean removeMemberOnGrammarly(ExchangeCode exchangeCode, GrammarlyAccount grammarlyAccount);
 }

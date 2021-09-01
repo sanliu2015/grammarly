@@ -3,6 +3,7 @@ package com.plq.grammarly.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpStatus;
@@ -56,7 +57,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+//    @Transactional(rollbackFor = Exception.class)
     public Set<String> gen(GenParamVO genParamVO) {
         Set<String> numbers = new HashSet<>(genParamVO.getCount());
         Set<ExchangeCode> exchangeCodes = new HashSet<>();
@@ -71,20 +72,21 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                         .expireStatus(false)
                         .removeStatus(false)
                         .build();
-                exchangeCodes.add(exchangeCode);
-                genCount ++;
-                numbers.add(number);
+                try {
+                    exchangeCodeRepository.save(exchangeCode);
+                    numbers.add(number);
+                    genCount ++;
+                } catch (Exception e) {
+                    log.warn("生成的兑换码重复{}，丢弃，继续重生", number);
+                }
             }
-        }
-        if (exchangeCodes.size() > 0) {
-            exchangeCodeRepository.saveAll(exchangeCodes);
         }
         return numbers;
     }
 
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+//    @Transactional(rollbackFor = Exception.class)
     public Result exchange(ExchangeParamVO exchangeParamVO) {
         Example<ExchangeCode> example = Example.of(ExchangeCode.builder().number(exchangeParamVO.getNumber()).build());
         ExchangeCode exchangeCode = exchangeCodeRepository.findOne(example).orElse(null);
@@ -180,44 +182,14 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
         return successFlag;
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean remove(ExchangeCode exchangeCode) {
-        boolean flag = false;
         GrammarlyAccount grammarlyAccount = grammarlyAccountService.findByAccount(exchangeCode.getInviterAccount());
         if (grammarlyAccount == null) {
             log.warn("移除失败，兑换码{}对应的邀请方账号{}详细信息没找到", exchangeCode.getNumber(), exchangeCode.getInviterAccount());
             return false;
         }
-        Map<String, String> httpRequestHeadMap = BizUtil.convertFromCurl(grammarlyAccount.getCurlStr());
-        HttpRequest httpRequest = BizUtil.buildRemoveHttpRequest(httpRequestHeadMap);
-        Map<String, Object> map = new HashMap<>(16);
-        map.put("type", "Active");
-        map.put("reverse", false);
-        map.put("emails", Lists.newArrayList(exchangeCode.getEmail()));
-        httpRequest.body(JSONUtil.toJsonStr(map));
-        try {
-            HttpResponse httpResponse = httpRequest.timeout(30000).execute();
-            if (httpResponse.getStatus() == HttpStatus.HTTP_NO_CONTENT) {
-                exchangeCode.setRemoveStatus(true);
-                exchangeCode.setRemoveTime(new Date());
-                exchangeCode.setErrorMsg("");
-                flag = true;
-                log.info("grammarly删除用户成功，exchangeCode：{}", exchangeCode);
-            } else {
-                StringBuilder sb = new StringBuilder(exchangeCode.getErrorMsg() == null ? "" : exchangeCode.getErrorMsg());
-                sb.append("grammarly账号：").append(grammarlyAccount.getAccount())
-                        .append("删除失败，响应码:").append(httpResponse.getStatus())
-                        .append("|");
-                log.error("grammarly账号：{}，删除{}失败，响应码：{}，响应体：{}", grammarlyAccount.getAccount(),
-                        exchangeCode.getEmail(), httpResponse.getStatus(), httpResponse.body());
-                exchangeCode.setErrorMsg(sb.toString());
-            }
-            exchangeCodeRepository.save(exchangeCode);
-        } catch (Exception e) {
-            log.error("grammarly删除用户网络异常", e);
-        }
-        return flag;
+        return SpringUtil.getBean(ExchangeCodeService.class).removeMemberOnGrammarly(exchangeCode, grammarlyAccount);
     }
 
     @Override
@@ -262,5 +234,39 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
     @Override
     public void delete(ExchangeCode exchangeCode) {
         exchangeCodeRepository.delete(exchangeCode);
+    }
+
+    @Override
+    public boolean removeMemberOnGrammarly(ExchangeCode exchangeCode, GrammarlyAccount grammarlyAccount) {
+        boolean flag = false;
+        Map<String, String> httpRequestHeadMap = BizUtil.convertFromCurl(grammarlyAccount.getCurlStr());
+        HttpRequest httpRequest = BizUtil.buildRemoveHttpRequest(httpRequestHeadMap);
+        Map<String, Object> map = new HashMap<>(16);
+        map.put("type", "Active");
+        map.put("reverse", false);
+        map.put("emails", Lists.newArrayList(exchangeCode.getEmail()));
+        httpRequest.body(JSONUtil.toJsonStr(map));
+        try {
+            HttpResponse httpResponse = httpRequest.timeout(30000).execute();
+            if (httpResponse.getStatus() == HttpStatus.HTTP_NO_CONTENT) {
+                exchangeCode.setRemoveStatus(true);
+                exchangeCode.setRemoveTime(new Date());
+                exchangeCode.setErrorMsg("");
+                flag = true;
+                log.info("grammarly删除用户成功，exchangeCode：{}", exchangeCode);
+            } else {
+                StringBuilder sb = new StringBuilder(exchangeCode.getErrorMsg() == null ? "" : exchangeCode.getErrorMsg());
+                sb.append("grammarly账号：").append(grammarlyAccount.getAccount())
+                        .append("删除失败，响应码:").append(httpResponse.getStatus())
+                        .append("|");
+                log.error("grammarly账号：{}，删除{}失败，响应码：{}，响应体：{}", grammarlyAccount.getAccount(),
+                        exchangeCode.getEmail(), httpResponse.getStatus(), httpResponse.body());
+                exchangeCode.setErrorMsg(sb.toString());
+            }
+            exchangeCodeRepository.save(exchangeCode);
+        } catch (Exception e) {
+            log.error("grammarly删除用户网络异常", e);
+        }
+        return flag;
     }
 }
