@@ -16,6 +16,7 @@ import com.plq.grammarly.service.GrammarlyAccountService;
 import com.plq.grammarly.util.BizUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
+@Profile("pro")
 public class GrammarlyTask {
 
     private final GrammarlyAccountService grammarlyAccountService;

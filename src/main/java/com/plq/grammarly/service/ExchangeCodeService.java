@@ -47,4 +47,6 @@ public interface ExchangeCodeService {
     ExchangeCode getObjById(String id);
 
     void updateObj(ExchangeCode exchangeCode);
+
+    void delete(ExchangeCode exchangeCode);
 }

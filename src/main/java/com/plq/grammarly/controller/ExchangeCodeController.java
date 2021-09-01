@@ -88,6 +88,26 @@ public class ExchangeCodeController {
     }
 
     /**
+     * 删除
+     * @param ids
+     * @return
+     */
+    @DeleteMapping("/exchangeCode")
+    @ResponseBody
+    public Result delete(@RequestBody String[] ids) {
+        boolean result = true;
+        for (String id : ids) {
+            ExchangeCode exchangeCode = exchangeCodeService.getObjById(id);
+            if (exchangeCode.getExchangeStatus()) {
+                result = result && exchangeCodeService.remove(exchangeCode);
+            } else {
+                exchangeCodeService.delete(exchangeCode);
+            }
+        }
+        return Result.success(result);
+    }
+
+    /**
      * 修改删除状态
      * @param id
      * @param removeStatus

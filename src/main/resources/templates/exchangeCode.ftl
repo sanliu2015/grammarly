@@ -47,11 +47,11 @@
     <script type="text/html" id="toolbarDemo">
         <div class="layui-btn-container">
             <button class="layui-btn layui-btn-sm" onclick="gen()">产生兑换码</button>
+            <button class="layui-btn layui-btn-danger layui-btn-sm" onclick="remove()" title="已兑换的不会被删除而是删除grammary会员">删除</button>
         </div>
     </script>
     <script type="text/html" id="rowBar">
-        <a class="layui-btn layui-btn-xs" lay-event="edit">变更状态</a>
-        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除会员</a>
+        <a class="layui-btn layui-btn-xs" lay-event="edit">变更删除状态</a>
     </script>
     <table class="layui-hide" id="test" lay-filter="test"></table>
 
@@ -147,11 +147,11 @@
                 ,{field:'exchangeStatus', width:90, title: '是否兑换'}
                 ,{field:'exchangeTime', width:180, title: '兑换时间'}
                 ,{field:'email', minWidth: 200, title: '兑换邮箱'}
-                ,{field:'memberDeadline', title: '到期日期', minWidth: 150}
-                ,{field:'expireStatus', width:90, title: '是否到期'}
-                ,{field:'removeStatus', width:90, title: '是否删除'}
+                ,{field:'memberDeadline', title: '会员到期日', minWidth: 150}
+                ,{field:'expireStatus', width:90, title: '会员到期'}
+                ,{field:'removeStatus', width:90, title: '会员删除'}
                 ,{field:'inviterAccount', width:200, title: '邀请者账号'}
-                ,{fixed: 'right', title:'操作', toolbar: '#rowBar', width:160}
+                ,{fixed: 'right', title:'操作', toolbar: '#rowBar', width:200}
             ]]
             ,page: true
             ,limits: [10,20,50,100]
@@ -172,7 +172,6 @@
                         dataType: "json",
                         success: function(res){
                             if (res.code == 200) {
-                                debugger;
                                 if (res.data) {
                                     layer.msg('删除会员操作成功!', {icon: 1, time: 1000}, function(){
                                         $('.demoTable .layui-btn').trigger("click");
@@ -206,7 +205,6 @@
                         cache: false,
                         dataType: "json",
                         success: function(res){
-                            debugger;
                             if (res.code == 200) {
                                 layer.msg('变更状态操作成功!', {icon: 1, time: 1000}, function(){
                                     $('.demoTable .layui-btn').trigger("click");
@@ -238,6 +236,50 @@
             $("#exchangeDeadline").val("");
             $("#result").empty();
             $('#exampleModal').modal('show');
+        }
+
+        window.remove = function() {
+            var checkStatus = table.checkStatus('test');
+            if (checkStatus.data.length === 0) {
+                layer.msg('请选择一行');
+                return;
+            }
+            var data = checkStatus.data; //获取选中的数据
+            var ids = [];
+            for (let row of data) {
+                ids.push(row.id);
+            }
+            layer.confirm('确定要删除吗？', function(index){
+                layer.load();
+                $.ajax({
+                    url: "${ctx.contextPath}/exchangeCode",
+                    type: "delete",
+                    contentType: 'application/json',
+                    cache: false,
+                    dataType: "json",
+                    data: JSON.stringify(ids),
+                    success: function(res){
+                        if (res.code == 200) {
+                            if (res.data) {
+                                layer.msg('删除成功!', {icon: 1, time: 1000}, function(){
+                                    $('.demoTable .layui-btn').trigger("click");
+                                });
+                            } else {
+                                layer.alert('删除失败，详见后台日志', {icon: 5, time: 5000});
+                            }
+                        } else {
+                            layer.alert(res.msg, {icon: 5});
+                        }
+                    },
+                    error:function(res) {
+                        layer.alert(res.responseJSON.message, {icon: 5});
+                    },
+                    complete: function () {
+                        layer.closeAll('loading');
+                    }
+                });
+                layer.close(index);
+            });
         }
 
         window.mysubmit = function() {

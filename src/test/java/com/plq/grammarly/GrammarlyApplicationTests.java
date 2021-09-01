@@ -39,8 +39,8 @@ class GrammarlyApplicationTests {
 	private ExchangeCodeRepository exchangeCodeRepository;
 	@Autowired
 	private GrammarlyAccountRepository grammarlyAccountRepository;
-	@Autowired
-	private GrammarlyTask grammarlyTask;
+//	@Autowired
+//	private GrammarlyTask grammarlyTask;
 
 	@Test
 	void contextLoads() {
@@ -102,10 +102,10 @@ class GrammarlyApplicationTests {
 
 	}
 
-	@Test
-	void testHeartBeat() {
-		grammarlyTask.keepHeartbeat();
-	}
+//	@Test
+//	void testHeartBeat() {
+//		grammarlyTask.keepHeartbeat();
+//	}
 
 
 	@Test
@@ -138,6 +138,12 @@ class GrammarlyApplicationTests {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	@Test
+	void testFindOne() {
+		GrammarlyAccount grammarlyAccount = grammarlyAccountService.findByAccount("fdylhgzz918631@163.com");
+		System.out.println(grammarlyAccount.getId());
 	}
 
 }

@@ -258,4 +258,9 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
     public void updateObj(ExchangeCode exchangeCode) {
         exchangeCodeRepository.save(exchangeCode);
     }
+
+    @Override
+    public void delete(ExchangeCode exchangeCode) {
+        exchangeCodeRepository.delete(exchangeCode);
+    }
 }

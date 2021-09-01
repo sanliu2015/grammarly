@@ -5,6 +5,7 @@ import com.plq.grammarly.repository.GrammarlyAccountRepository;
 import com.plq.grammarly.service.GrammarlyAccountService;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
