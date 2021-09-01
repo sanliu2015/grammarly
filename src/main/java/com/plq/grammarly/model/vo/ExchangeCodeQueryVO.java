@@ -30,4 +30,14 @@ public class ExchangeCodeQueryVO {
 
     private Integer page;
     private Integer limit;
+
+    /**
+     * 未兑换且过期
+     */
+    private Boolean cond1;
+
+    /**
+     * 会员到期未删除
+     */
+    private Boolean cond2;
 }

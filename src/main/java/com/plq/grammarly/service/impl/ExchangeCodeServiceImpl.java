@@ -211,6 +211,16 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
 //        if (exchangeCodeQueryVO.getMemberDeadlineStart() != null) {
 //            matcher.withMatcher("memberDeadline", ExampleMatcher.)
 //        }
+
+        if (exchangeCodeQueryVO.getCond2()) {
+            exchangeCode.setExpireStatus(true);
+            exchangeCode.setRemoveStatus(false);
+            matcher.withMatcher("expireStatus", ExampleMatcher.GenericPropertyMatchers.exact());
+            matcher.withMatcher("removeStatus", ExampleMatcher.GenericPropertyMatchers.exact());
+        }
+        if (exchangeCodeQueryVO.getCond1()) {
+
+        }
         Example example = Example.of(exchangeCode, matcher);
         Page page = exchangeCodeRepository.findAll(example, pageRequest);
         Map<String, Object> result = new HashMap<>();

@@ -42,6 +42,11 @@
         <div class="layui-inline">
             <input class="layui-input" placeholder="模糊匹配" name="email" id="email" autocomplete="off">
         </div>
+        快捷筛选：
+        <div class="layui-inline">
+            <input type="checkbox" id="cond1" />未兑换且过期&nbsp;&nbsp;
+            <input type="checkbox" id="cond2" />会员到期未删除
+        </div>
         <button class="layui-btn" data-type="reload">搜索</button>
     </div>
     <script type="text/html" id="toolbarDemo">
@@ -116,12 +121,17 @@
                 var whereObj = {};
                 var number = $.trim($('#number').val());
                 var email = $.trim($('#email').val());
+                var cond1 = $("#cond1").prop('checked');
+                var cond2 = $("#cond2").prop('checked');
+                console.log(cond1);
                 if (number != "") {
                     whereObj.number = number;
                 }
                 if (email != "") {
                     whereObj.email = email;
                 }
+                whereObj.cond1 = cond1;
+                whereObj.cond2 = cond2;
                 // 执行重载,重新从第 1 页开始
                 table.reload('test', {
                     page: {
