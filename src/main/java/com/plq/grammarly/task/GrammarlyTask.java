@@ -100,7 +100,7 @@ public class GrammarlyTask {
                 exchangeCodeService.updateObj(exchangeCode);
             }
         } catch (Exception e) {
-            log.error("更新兑换过期状态");
+            log.error("更新兑换过期状态任务出现异常");
         }
     }
 
