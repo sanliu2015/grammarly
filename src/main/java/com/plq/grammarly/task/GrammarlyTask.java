@@ -104,6 +104,9 @@ public class GrammarlyTask {
         }
     }
 
+    /**
+     * 启动把所有未兑换且逾期的兑换过期状态职位true
+     */
     @PostConstruct
     void init() {
         Date now = new Date();
@@ -112,8 +115,11 @@ public class GrammarlyTask {
         Date edate = DateUtil.parse(day + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
         List<ExchangeCode> exchangeCodes = exchangeCodeService.findByExchangeStatusFalseAndExchangeDeadlineBetween(sdate, edate);
         for (ExchangeCode exchangeCode : exchangeCodes) {
-            exchangeCode.setExchangeExpireStatus(true);
-            exchangeCodeService.updateObj(exchangeCode);
+            if (exchangeCode.getExchangeExpireStatus() == null || exchangeCode.getExchangeExpireStatus() == false) {
+                exchangeCode.setUpdateTime(now);
+                exchangeCode.setExchangeExpireStatus(true);
+                exchangeCodeService.updateObj(exchangeCode);
+            }
         }
     }
 

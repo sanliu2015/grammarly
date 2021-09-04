@@ -217,13 +217,13 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
 //            matcher.withMatcher("memberDeadline", ExampleMatcher.)
 //        }
 
-        if (exchangeCodeQueryVO.getCond2()) {
+        if (exchangeCodeQueryVO.getCond2() != null && exchangeCodeQueryVO.getCond2()) {
             exchangeCode.setExpireStatus(true);
             exchangeCode.setRemoveStatus(false);
             matcher.withMatcher("expireStatus", ExampleMatcher.GenericPropertyMatchers.exact());
             matcher.withMatcher("removeStatus", ExampleMatcher.GenericPropertyMatchers.exact());
         }
-        if (exchangeCodeQueryVO.getCond1()) {
+        if (exchangeCodeQueryVO.getCond1() != null && exchangeCodeQueryVO.getCond1()) {
             exchangeCode.setExchangeStatus(false);
             exchangeCode.setExchangeExpireStatus(true);
             matcher.withMatcher("exchangeStatus", ExampleMatcher.GenericPropertyMatchers.exact());

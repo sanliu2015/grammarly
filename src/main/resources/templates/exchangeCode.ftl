@@ -56,7 +56,7 @@
         </div>
     </script>
     <script type="text/html" id="rowBar">
-        <a class="layui-btn layui-btn-xs" lay-event="edit">变更删除状态</a>
+        <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="edit">修改会员删除状态</a>
     </script>
     <table class="layui-hide" id="test" lay-filter="test"></table>
 
@@ -153,7 +153,7 @@
                 ,{field:'id', width:80, title: 'ID', hide: true, fixed: 'left' }
                 ,{field:'number', width:160, title: '兑换码', fixed: 'left' }
                 ,{field:'createTime', width:180, title: '生成时间'}
-                ,{field:'exchangeDeadline', width:120, title: '截止兑换日期'}
+                ,{field:'exchangeDeadline', width:120, title: '截止兑换日'}
                 ,{field:'exchangeStatus', width:90, title: '是否兑换'}
                 ,{field:'exchangeTime', width:180, title: '兑换时间'}
                 ,{field:'email', minWidth: 200, title: '兑换邮箱'}
@@ -161,7 +161,7 @@
                 ,{field:'expireStatus', width:90, title: '会员到期'}
                 ,{field:'removeStatus', width:90, title: '会员删除'}
                 ,{field:'inviterAccount', width:200, title: '邀请者账号'}
-                ,{fixed: 'right', title:'操作', toolbar: '#rowBar', width:200}
+                ,{fixed: 'right', title:'操作', toolbar: '#rowBar', width:160}
             ]]
             ,page: true
             ,limits: [10,20,50,100]
@@ -204,7 +204,8 @@
                 });
             } else if(obj.event === 'edit'){
                 layer.prompt({
-                    formType: 2
+                    title: '会员删除状态修改'
+                    ,formType: 2
                     ,value: !data.removeStatus
                 }, function(value, index){
                     layer.load();
