@@ -52,4 +52,6 @@ public interface ExchangeCodeService {
     void delete(ExchangeCode exchangeCode);
 
     boolean removeMemberOnGrammarly(ExchangeCode exchangeCode, GrammarlyAccount grammarlyAccount);
+
+    List<ExchangeCode> findByExchangeStatusFalseAndExchangeDeadlineBetween(Date sdate, Date edate);
 }

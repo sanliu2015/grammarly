@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Profile("dev")
+@Profile("uat")
 @SpringBootTest
 @Slf4j
 class GrammarlyApplicationTests {
@@ -144,6 +144,19 @@ class GrammarlyApplicationTests {
 	void testFindOne() {
 		GrammarlyAccount grammarlyAccount = grammarlyAccountService.findByAccount("fdylhgzz918631@163.com");
 		System.out.println(grammarlyAccount.getId());
+	}
+
+	@Test
+	void testExchangeDeadline() {
+		Date now = new Date();
+		String day = DateUtil.format(now, "yyyy-MM-dd");
+		Date sdate = DateUtil.parse("2021-06-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
+		Date edate = DateUtil.parse(day + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
+		List<ExchangeCode> exchangeCodes = exchangeCodeService.findByExchangeStatusFalseAndExchangeDeadlineBetween(sdate, edate);
+		for (ExchangeCode exchangeCode : exchangeCodes) {
+			exchangeCode.setExchangeExpireStatus(true);
+			exchangeCodeService.updateObj(exchangeCode);
+		}
 	}
 
 }

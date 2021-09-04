@@ -4,6 +4,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpRequest;
@@ -78,6 +81,39 @@ public class GrammarlyTask {
             }
         } catch (Exception e) {
             log.error("定时删除过期任务出现异常", e);
+        }
+    }
+
+    /**
+     * 兑换截至日期过期状态
+     */
+    @Scheduled(cron = "10 0 0 * * ?")
+    public void exchangeExpire() {
+        try {
+            Date now = new Date();
+            String day = DateUtil.format(now, "yyyy-MM-dd");
+            Date sdate = DateUtil.parse(day + " 00:00:00", "yyyy-MM-dd HH:mm:ss");
+            Date edate = DateUtil.parse(day + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
+            List<ExchangeCode> exchangeCodes = exchangeCodeService.findByExchangeStatusFalseAndExchangeDeadlineBetween(sdate, edate);
+            for (ExchangeCode exchangeCode : exchangeCodes) {
+                exchangeCode.setExchangeExpireStatus(true);
+                exchangeCodeService.updateObj(exchangeCode);
+            }
+        } catch (Exception e) {
+            log.error("更新兑换过期状态");
+        }
+    }
+
+    @PostConstruct
+    void init() {
+        Date now = new Date();
+        String day = DateUtil.format(now, "yyyy-MM-dd");
+        Date sdate = DateUtil.parse("2021-06-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
+        Date edate = DateUtil.parse(day + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
+        List<ExchangeCode> exchangeCodes = exchangeCodeService.findByExchangeStatusFalseAndExchangeDeadlineBetween(sdate, edate);
+        for (ExchangeCode exchangeCode : exchangeCodes) {
+            exchangeCode.setExchangeExpireStatus(true);
+            exchangeCodeService.updateObj(exchangeCode);
         }
     }
 

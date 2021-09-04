@@ -198,6 +198,11 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
     }
 
     @Override
+    public List<ExchangeCode> findByExchangeStatusFalseAndExchangeDeadlineBetween(Date sdate, Date edate) {
+        return exchangeCodeRepository.findByExchangeStatusFalseAndExchangeDeadlineBetween(sdate, edate);
+    }
+
+    @Override
     public Map<String, Object> pageQuery(ExchangeCodeQueryVO exchangeCodeQueryVO) {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         PageRequest pageRequest = PageRequest.of(exchangeCodeQueryVO.getPage() - 1, exchangeCodeQueryVO.getLimit(), sort);
@@ -219,7 +224,10 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
             matcher.withMatcher("removeStatus", ExampleMatcher.GenericPropertyMatchers.exact());
         }
         if (exchangeCodeQueryVO.getCond1()) {
-
+            exchangeCode.setExchangeStatus(false);
+            exchangeCode.setExchangeExpireStatus(true);
+            matcher.withMatcher("exchangeStatus", ExampleMatcher.GenericPropertyMatchers.exact());
+            matcher.withMatcher("exchangeExpireStatus", ExampleMatcher.GenericPropertyMatchers.exact());
         }
         Example example = Example.of(exchangeCode, matcher);
         Page page = exchangeCodeRepository.findAll(example, pageRequest);

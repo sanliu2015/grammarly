@@ -45,6 +45,11 @@ public class ExchangeCode implements Serializable {
     private Date exchangeDeadline;
 
     /**
+     * 兑换过期状态
+     */
+    private Boolean exchangeExpireStatus;
+
+    /**
      * 生成日期
      */
     @CreatedDate
