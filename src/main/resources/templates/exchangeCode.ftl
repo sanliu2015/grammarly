@@ -52,12 +52,12 @@
     <script type="text/html" id="toolbarDemo">
         <div class="layui-btn-container">
             <button class="layui-btn layui-btn-sm" onclick="gen()">产生兑换码</button>
-            <button class="layui-btn layui-btn-danger layui-btn-sm" onclick="remove()" title="已兑换的不会被删除而是删除grammary会员">删除</button>
+            <button class="layui-btn layui-btn-danger layui-btn-sm" onclick="remove()" title="未兑换的是删除记录，已兑换的不会删除记录而是删除grammarly会员">删除</button>
         </div>
     </script>
-    <script type="text/html" id="rowBar">
-        <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="edit">修改会员删除状态</a>
-    </script>
+<#--    <script type="text/html" id="rowBar">-->
+<#--        <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="edit">修改会员删除状态</a>-->
+<#--    </script>-->
     <table class="layui-hide" id="test" lay-filter="test"></table>
 
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
@@ -154,14 +154,14 @@
                 ,{field:'number', width:160, title: '兑换码', fixed: 'left' }
                 ,{field:'createTime', width:180, title: '生成时间'}
                 ,{field:'exchangeDeadline', width:120, title: '截止兑换日'}
-                ,{field:'exchangeStatus', width:90, title: '是否兑换'}
+                ,{field:'exchangeStatus', width:90, title: '是否兑换', event: 'setExchangeStatus', style:'cursor: pointer;'}
                 ,{field:'exchangeTime', width:180, title: '兑换时间'}
                 ,{field:'email', minWidth: 200, title: '兑换邮箱'}
                 ,{field:'memberDeadline', title: '会员到期日', minWidth: 150}
                 ,{field:'expireStatus', width:90, title: '会员到期'}
-                ,{field:'removeStatus', width:90, title: '会员删除'}
+                ,{field:'removeStatus', width:90, title: '会员删除', event: 'setRemoveStatus', style:'cursor: pointer;'}
                 ,{field:'inviterAccount', width:200, title: '邀请者账号'}
-                ,{fixed: 'right', title:'操作', toolbar: '#rowBar', width:160}
+                // ,{fixed: 'right', title:'操作', toolbar: '#rowBar', width:160}
             ]]
             ,page: true
             ,limits: [10,20,50,100]
@@ -202,9 +202,9 @@
                     });
                     layer.close(index);
                 });
-            } else if(obj.event === 'edit'){
+            } else if(obj.event === 'setRemoveStatus'){
                 layer.prompt({
-                    title: '会员删除状态修改'
+                    title: '修改会员删除状态'
                     ,formType: 2
                     ,value: !data.removeStatus
                 }, function(value, index){
@@ -233,6 +233,10 @@
                     });
                     layer.close(index);
                 });
+            } else if(obj.event === 'setExchangeStatus'){
+                if (!data.exchangeStatus && data.errorMsg) {
+                    layer.alert(data.errorMsg, {icon: 5, title: '兑换失败提示'});
+                }
             }
         });
 
