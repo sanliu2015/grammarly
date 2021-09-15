@@ -77,6 +77,7 @@ public class GrammarlyTask {
             List<ExchangeCode> exchangeCodes = exchangeCodeService.listMemberExpire(now);
             log.info("共找到{}条过期信息", exchangeCodes.size());
             for (ExchangeCode exchangeCode : exchangeCodes) {
+                exchangeCode.setExpireStatus(true);  // 标记为会员过期
                 exchangeCodeService.remove(exchangeCode);
             }
         } catch (Exception e) {

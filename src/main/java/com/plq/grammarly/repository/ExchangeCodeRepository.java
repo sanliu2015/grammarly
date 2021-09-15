@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
  */
 public interface ExchangeCodeRepository extends MongoRepository<ExchangeCode, String> {
 
-    List<ExchangeCode> findByExchangeStatusTrueAndRemoveStatusFalseAndMemberDeadlineLessThan(Date date);
+    List<ExchangeCode> findByExchangeStatusTrueAndExpireStatusFalseAndRemoveStatusFalseAndMemberDeadlineLessThan(Date date);
 
     List<ExchangeCode> findByExchangeStatusFalseAndExchangeDeadlineBetween(Date sdate, Date edate);
 }

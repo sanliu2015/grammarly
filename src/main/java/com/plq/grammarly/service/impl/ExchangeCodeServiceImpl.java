@@ -194,7 +194,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
 
     @Override
     public List<ExchangeCode> listMemberExpire(Date date) {
-        return exchangeCodeRepository.findByExchangeStatusTrueAndRemoveStatusFalseAndMemberDeadlineLessThan(date);
+        return exchangeCodeRepository.findByExchangeStatusTrueAndExpireStatusFalseAndRemoveStatusFalseAndMemberDeadlineLessThan(date);
     }
 
     @Override
