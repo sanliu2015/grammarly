@@ -43,3 +43,25 @@ db.exchangeCode.deleteMany({exchangeStatus: false, exchangeDeadline: {$lte: ISOD
 ![img.png](img.png)  
 ![img_1.png](img_1.png)  
 ![img_2.png](img_2.png)  
+
+## 数据库还原
+环境变量设置mongo
+![img_9.png](img_9.png)
+
+安装开发者工具才能还原
+![img_10.png](img_10.png)
+
+下载开发者工具，解压把bin下文件解压到mongo目录下
+![img_12.png](img_12.png)
+
+![img_11.png](img_11.png)
+
+还原命令 ```mongorestore -d grammarly --dir C:\temp\grammarly```
+![img_13.png](img_13.png)
+
+
+
+
+## 清理mongo日志文件
+![img_3.png](img_3.png) 
+![img_4.png](img_4.png)
