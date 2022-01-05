@@ -12,13 +12,7 @@ import com.plq.grammarly.service.ExchangeCodeService;
 import com.plq.grammarly.util.Result;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * This is Description
@@ -94,11 +88,12 @@ public class ExchangeCodeController {
      */
     @DeleteMapping("/exchangeCode")
     @ResponseBody
-    public Result delete(@RequestBody String[] ids) {
+    public Result delete(@RequestBody String[] ids, @RequestParam("reason") String reason) {
         boolean result = true;
         for (String id : ids) {
             ExchangeCode exchangeCode = exchangeCodeService.getObjById(id);
             if (exchangeCode.getExchangeStatus()) {
+                exchangeCode.setReason(reason);
                 result = result && exchangeCodeService.remove(exchangeCode);
             } else {
                 exchangeCodeService.delete(exchangeCode);

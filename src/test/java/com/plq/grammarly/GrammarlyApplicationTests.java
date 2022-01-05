@@ -61,7 +61,7 @@ class GrammarlyApplicationTests {
 		exchangeCode.setMemberDeadline(DateUtil.beginOfDay(new Date()));
 		exchangeCodeRepository.insert(exchangeCode);
 		List<ExchangeCode> exchangeCodes = exchangeCodeRepository
-				.findByExchangeStatusTrueAndRemoveStatusFalseAndMemberDeadlineLessThan(new Date());
+				.findByExchangeStatusTrueAndExpireStatusFalseAndRemoveStatusFalseAndMemberDeadlineLessThan(new Date());
 		System.out.println(JSONUtil.toJsonStr(exchangeCodes));
 	}
 

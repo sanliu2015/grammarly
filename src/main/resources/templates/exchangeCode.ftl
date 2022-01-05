@@ -264,10 +264,10 @@
             for (let row of data) {
                 ids.push(row.id);
             }
-            layer.confirm('确定要删除吗？', function(index){
+            layer.prompt(function(val,index){
                 layer.load();
                 $.ajax({
-                    url: "${ctx.contextPath}/exchangeCode",
+                    url: "${ctx.contextPath}/exchangeCode?reason=" + val,
                     type: "delete",
                     contentType: 'application/json',
                     cache: false,
