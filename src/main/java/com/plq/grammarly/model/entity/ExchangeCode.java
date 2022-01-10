@@ -98,6 +98,8 @@ public class ExchangeCode implements Serializable {
     @LastModifiedDate
     private Date updateTime;
 
+    private String reason;
+
     @Tolerate
     public ExchangeCode() {}
 
