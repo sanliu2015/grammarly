@@ -43,7 +43,7 @@ public class BizUtil {
      * @return
      */
     public static HttpRequest buildInviteHttpRequest(Map<String, String> httpRequestHeadMap) {
-        return HttpUtil.createPost("https://institution.grammarly.com/api/institution/admin/users/add")
+        return HttpUtil.createPost("https://goldengate.grammarly.com/institution/api/institution/admin/users/add")
                 .header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36")
                 .header("sec-fetch-site", "same-site")
                 .header("sec-fetch-mode", "cors")
@@ -54,7 +54,7 @@ public class BizUtil {
                 .header("origin", "https://account.grammarly.com")
                 .header("content-type", "application/json")
                 .header("accept", "*/*")
-                .header("authority", "institution.grammarly.com")
+                .header("authority", "goldengate.grammarly.com")
                 .header("referer", "https://account.grammarly.com/admin/members")
                 .header("accept-language", "zh-CN,zh;q=0.9")
                 .header("x-container-id", httpRequestHeadMap.get("x-container-id"))
@@ -66,7 +66,7 @@ public class BizUtil {
     }
 
     public static HttpRequest buildRemoveHttpRequest(Map<String, String> httpRequestHeadMap) {
-        return HttpUtil.createPost("https://institution.grammarly.com/api/institution/admin/users/delete")
+        return HttpUtil.createPost("https://goldengate.grammarly.com/institution/api/institution/admin/users/delete")
                 .header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36")
                 .header("sec-fetch-site", "same-site")
                 .header("sec-fetch-mode", "cors")
@@ -77,7 +77,7 @@ public class BizUtil {
                 .header("origin", "https://account.grammarly.com")
                 .header("content-type", "application/json")
                 .header("accept", "*/*")
-                .header("authority", "institution.grammarly.com")
+                .header("authority", "goldengate.grammarly.com")
                 .header("referer", "https://account.grammarly.com/admin/members")
                 .header("accept-language", "zh-CN,zh;q=0.9")
                 .header("x-container-id", httpRequestHeadMap.get("x-container-id"))
@@ -89,7 +89,7 @@ public class BizUtil {
     }
 
     public static HttpRequest buildQueryHttpRequest(Map<String, String> httpRequestHeadMap) {
-        return HttpUtil.createGet("https://institution.grammarly.com/api/institution/admin/users/find_all?offset=0&limit=10&order=email&order_type=asc&type=Invited")
+        return HttpUtil.createGet("https://goldengate.grammarly.com/institution/api/institution/admin/users/find_all?offset=0&limit=10&order=email&order_type=asc&type=Invited")
                 .header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36")
                 .header("sec-fetch-site", "same-site")
                 .header("sec-fetch-mode", "cors")
@@ -99,7 +99,7 @@ public class BizUtil {
                 .header("sec-ch-ua-mobile", "?0")
                 .header("origin", "https://account.grammarly.com")
                 .header("accept", "application/json")
-                .header("authority", "institution.grammarly.com")
+                .header("authority", "goldengate.grammarly.com")
                 .header("referer", "https://account.grammarly.com/customize/language")
                 .header("accept-language", "zh-CN,zh;q=0.9")
                 .header("x-container-id", httpRequestHeadMap.get("x-container-id"))
@@ -131,8 +131,8 @@ public class BizUtil {
                 "  --compressed";
         System.out.println(JSONUtil.toJsonStr(convertFromCurl(s)));
 
-        String b = "curl 'https://institution.grammarly.com/api/institution/admin/users/find_all?offset=0&limit=100&order=email&order_type=asc&type=Invited' \\\n" +
-                "-H 'authority: institution.grammarly.com' \\\n" +
+        String b = "curl 'https://goldengate.grammarly.com/institution/api/institution/admin/users/find_all?offset=0&limit=100&order=email&order_type=asc&type=Invited' \\\n" +
+                "-H 'authority: goldengate.grammarly.com' \\\n" +
                 "-H 'sec-ch-ua: \" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"' \\\n" +
                 "-H 'x-csrf-token: AABJXztZJjQSn6WLWIZZPbNDKA/VDutA/myaXg' \\\n" +
                 "-H 'x-client-version: 0.3.0-master.4784' \\\n" +
