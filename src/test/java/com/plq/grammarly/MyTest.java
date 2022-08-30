@@ -35,8 +35,8 @@ public class MyTest {
 
     private static void testQuery() {
         try {
-            String curl = "curl 'https://institution.grammarly.com/api/institution/admin/users/find_all?offset=0&limit=100&order=email&order_type=asc&type=Removed' \\\n" +
-                    "  -H 'authority: institution.grammarly.com' \\\n" +
+            String curl = "curl 'https://gnar.grammarly.com/api/institution/admin/users/find_all?offset=0&limit=100&order=email&order_type=asc&type=Removed' \\\n" +
+                    "  -H 'authority: gnar.grammarly.com' \\\n" +
                     "  -H 'sec-ch-ua: \" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"' \\\n" +
                     "  -H 'x-csrf-token: AABJXztZJjQSn6WLWIZZPbNDKA/VDutA/myaXg' \\\n" +
                     "  -H 'x-client-version: 0.3.0-master.4784' \\\n" +
@@ -64,8 +64,8 @@ public class MyTest {
 
     private static void testinvite() {
         try {
-            String curl = "curl 'https://institution.grammarly.com/api/institution/admin/users/find_all?offset=0&limit=100&order=email&order_type=asc&type=Removed' \\\n" +
-                    "  -H 'authority: institution.grammarly.com' \\\n" +
+            String curl = "curl 'https://gnar.grammarly.com/api/institution/admin/users/find_all?offset=0&limit=100&order=email&order_type=asc&type=Removed' \\\n" +
+                    "  -H 'authority: gnar.grammarly.com' \\\n" +
                     "  -H 'sec-ch-ua: \" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"' \\\n" +
                     "  -H 'x-csrf-token: AABJXztZJjQSn6WLWIZZPbNDKA/VDutA/myaXg' \\\n" +
                     "  -H 'x-client-version: 0.3.0-master.4784' \\\n" +
@@ -103,8 +103,8 @@ public class MyTest {
 
     private static void testDelete() {
         try {
-            String curl = "curl 'https://institution.grammarly.com/api/institution/admin/users/delete' \\\n" +
-                    "  -H 'authority: institution.grammarly.com' \\\n" +
+            String curl = "curl 'https://gnar.grammarly.com/api/institution/admin/users/delete' \\\n" +
+                    "  -H 'authority: gnar.grammarly.com' \\\n" +
                     "  -H 'sec-ch-ua: \" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"' \\\n" +
                     "  -H 'x-csrf-token: AABJXztZJjQSn6WLWIZZPbNDKA/VDutA/myaXg' \\\n" +
                     "  -H 'x-client-version: 0.3.0-master.4784' \\\n" +
