@@ -73,7 +73,7 @@
         }
         layer.load();
         $.ajax({
-            url: "http://localhost:5000/py/exchangeDownload",
+            url: "${ctx.contextPath}/py/exchangeDownload",
             type: "post",
             contentType: 'application/json',
             cache: false,

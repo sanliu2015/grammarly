@@ -238,7 +238,7 @@
             layer.load();
             $("#result").empty();
             $.ajax({
-                url: "http://localhost:5000/py/questionExchangeCode/gen",
+                url: "${ctx.contextPath}/py/questionExchangeCode/gen",
                 type: "post",
                 contentType: 'application/json',
                 cache: false,

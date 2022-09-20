@@ -60,7 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/login")                      //登陆页面
+                .loginPage("/index")                      //登陆页面
                 .successForwardUrl("/exchangeCode/gen")
                 .and().exceptionHandling()
                 .and().sessionManagement()
