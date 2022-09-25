@@ -1,6 +1,7 @@
 package com.plq.grammarly.task;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +12,8 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONUtil;
 import com.plq.grammarly.model.entity.ExchangeCode;
 import com.plq.grammarly.model.entity.GrammarlyAccount;
 import com.plq.grammarly.model.entity.QuestionExchangeCode;
@@ -116,7 +119,18 @@ public class GrammarlyTask {
         } catch (Exception e) {
             log.error("更新解锁兑换码过期状态任务出现异常");
         }
+    }
 
+    @Scheduled(cron = "25 0/20 * * * ?")
+    public void turnToUrlHeart() {
+        try {
+            Map<String, String> body = new HashMap<>();
+            HttpUtil.createPost("http://localhost:5000/py/turnToUrl")
+                    .body(JSONUtil.toJsonStr(body))
+                    .executeAsync();
+        } catch (Exception e) {
+            log.error("turnToUrlHeart任务出现异常", e);
+        }
     }
 
 
