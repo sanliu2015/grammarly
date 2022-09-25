@@ -59,29 +59,31 @@
             number: number,
             email: email
         }
-        layer.load();
-        $.ajax({
-            url: "${ctx.contextPath}/exchangeCode/exchange",
-            type: "post",
-            contentType: 'application/json',
-            cache: false,
-            dataType: "json",
-            data: JSON.stringify(data),
-            success: function(res){
-                if (res.code == 200) {
-                    // 兑换成功提示
-                    layer.msg("恭喜您，兑换成功，请前邮箱进行查收", {icon: 1, time: 3000}, function(){
-                    });
-                } else {
-                    layer.alert(res.msg, {icon: 5});
-                }
-            },
-            error:function(res) {
-                layer.alert(res.responseJSON.message, {icon: 5});
-            },
-            complete: function () {
-                layer.closeAll('loading');
-            }
+        // layer.load();
+        layer.confirm('确定接收邮箱是' + email, function(index){
+            $.ajax({
+                url: "${ctx.contextPath}/exchangeCode/exchange",
+                type: "post",
+                contentType: 'application/json',
+                cache: false,
+                dataType: "json",
+                data: JSON.stringify(data),
+                success: function(res){
+                    if (res.code == 200) {
+                        // 兑换成功提示
+                        layer.msg("恭喜您，兑换成功，请前邮箱进行查收", {icon: 1, time: 3000}, function(){
+                        });
+                    } else {
+                        layer.alert(res.msg, {icon: 5});
+                    }
+                },
+                error:function(res) {
+                    layer.alert(res.responseJSON.message, {icon: 5});
+                },
+                // complete: function () {
+                //     layer.closeAll('loading');
+                // }
+            });
         });
     }
 </script>

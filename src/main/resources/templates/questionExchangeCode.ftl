@@ -158,7 +158,7 @@
                    }}
                 ,{field:'receiveEmail', minWidth: 200, title: '接收邮箱'}
                 ,{field:'updateTime', width:180, title: '兑换时间'}
-                ,{field:'account', width:200, title: '解锁账号'}
+                // ,{field:'account', width:200, title: '解锁账号'}
             ]]
             ,page: true
             ,limits: [10,20,50,100]
@@ -245,7 +245,6 @@
                 dataType: "json",
                 data: JSON.stringify(data),
                 success: function(res){
-                    debugger
                     if (res.code == 200) {
                         let nums = res.data;
                         let innerHtml = "";

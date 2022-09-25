@@ -66,34 +66,38 @@
             layer.msg("网址url不能为空", function(){});
             return false;
         }
-        let data = {
-            code: code,
-            questionUrl: questionUrl,
-            receiveEmail: receiveEmail,
-        }
-        layer.load();
-        $.ajax({
-            url: "${ctx.contextPath}/py/exchangeDownload",
-            type: "post",
-            contentType: 'application/json',
-            cache: false,
-            dataType: "json",
-            data: JSON.stringify(data),
-            success: function(res){
-                if (res.code == 200) {
-                    // 兑换成功提示
-                    layer.msg("恭喜您，兑换成功，请前邮箱进行查收", {icon: 1, time: 3000}, function(){
-                    });
-                } else {
-                    layer.alert(res.message, {icon: 5});
-                }
-            },
-            error:function(res) {
-                layer.alert(res.responseJSON.message, {icon: 5});
-            },
-            complete: function () {
-                layer.closeAll('loading');
+        layer.confirm('确定接收邮箱是' + receiveEmail, function(index){
+            let data = {
+                code: code,
+                questionUrl: questionUrl,
+                receiveEmail: receiveEmail,
             }
+            // layer.load();
+            layer.msg("系统已收到您的请求，若您在3分钟后还没有收到邮件，请联系客服", {icon: 1, time: 5000}, function(){
+            });
+            $.ajax({
+                url: "${ctx.contextPath}/py/exchangeDownload",
+                type: "post",
+                contentType: 'application/json',
+                cache: false,
+                dataType: "json",
+                data: JSON.stringify(data),
+                success: function(res){
+                    if (res.code == 200) {
+                        // 兑换成功提示
+                        layer.msg("恭喜您，兑换成功，请前邮箱进行查收", {icon: 1, time: 3000}, function(){
+                        });
+                    } else {
+                        layer.alert(res.message, {icon: 5});
+                    }
+                },
+                error:function(res) {
+                    layer.alert(res.responseJSON.message, {icon: 5});
+                },
+                complete: function () {
+                    // layer.closeAll('loading');
+                }
+            });
         });
     }
 </script>
