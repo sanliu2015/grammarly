@@ -31,7 +31,7 @@
     </div>
     <div style="margin-top: 50px">
         <button type="button" class="btn btn-primary" onclick="add()">新增</button>
-        <button type="button" class="btn btn-primary" onclick="setunlock()">设置解锁页面用户凭证</button>
+<#--        <button type="button" class="btn btn-primary" onclick="setunlock()">设置解锁页面用户凭证</button>-->
     </div>
 
     <table class="table table-bordered">
