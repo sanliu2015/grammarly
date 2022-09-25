@@ -10,6 +10,7 @@ import com.plq.grammarly.model.vo.ExchangeParamVO;
 import com.plq.grammarly.model.vo.GenParamVO;
 import com.plq.grammarly.service.ExchangeCodeService;
 import com.plq.grammarly.util.Result;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -51,6 +52,7 @@ public class ExchangeCodeController {
      * @return
      */
     @PostMapping("/exchangeCode/gen")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseBody
     public Result gen(@RequestBody @Validated GenParamVO genParamVO) {
         Set<String> numbers = exchangeCodeService.gen(genParamVO);

@@ -10,7 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  */
 public class BCryptPasswordEncoderTest {
     public static void main(String[] args) {
-        String pass = "grammarly2021;;";
+        String pass = "grammarly2022;;";
         BCryptPasswordEncoder bcryptPasswordEncoder = new BCryptPasswordEncoder();
         String hashPass = bcryptPasswordEncoder.encode(pass);
         System.out.println(hashPass);

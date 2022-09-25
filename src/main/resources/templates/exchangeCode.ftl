@@ -1,3 +1,4 @@
+<#assign  sec=JspTaglibs["http://www.springframework.org/security/tags"] />
 <!doctype html>
 <html lang="zh">
 <head>
@@ -51,7 +52,9 @@
     </div>
     <script type="text/html" id="toolbarDemo">
         <div class="layui-btn-container">
+            <@sec.authorize access="hasRole('ROLE_ADMIN')">
             <button class="layui-btn layui-btn-sm" onclick="gen()">产生兑换码</button>
+            </@sec.authorize>
             <button class="layui-btn layui-btn-danger layui-btn-sm" onclick="remove()" title="未兑换的是删除记录，已兑换的不会删除记录而是删除grammarly会员">删除</button>
         </div>
     </script>

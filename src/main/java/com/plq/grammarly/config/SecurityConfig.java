@@ -3,10 +3,12 @@ package com.plq.grammarly.config;
 import com.plq.grammarly.filter.JwtFilter;
 import com.plq.grammarly.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -23,6 +25,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
  * @date 2021/06/16
  */
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -49,6 +52,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    /**
+     * 前端权限按钮
+     * @return
+     */
+    @Bean
+    @ConditionalOnMissingBean(ClassPathTldsLoader.class)
+    public ClassPathTldsLoader classPathTldsLoader(){
+        return new ClassPathTldsLoader();
     }
 
     @Override
