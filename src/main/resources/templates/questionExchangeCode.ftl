@@ -1,3 +1,4 @@
+<#assign  sec=JspTaglibs["http://www.springframework.org/security/tags"] />
 <!doctype html>
 <html lang="zh">
 <head>
@@ -56,7 +57,9 @@
     </div>
     <script type="text/html" id="toolbarDemo">
         <div class="layui-btn-container">
+            <@sec.authorize access="hasRole('ROLE_ADMIN')">
             <button class="layui-btn layui-btn-sm" onclick="gen()">产生兑换码</button>
+            </@sec.authorize>
         </div>
     </script>
     <table class="layui-hide" id="test" lay-filter="test"></table>
@@ -120,8 +123,9 @@
                     whereObj.code = code;
                 }
                 if (receiveEmail != "") {
-                    whereObj.receiveEmail = email;
+                    whereObj.receiveEmail = receiveEmail;
                 }
+                whereObj.status = $("#status").val();
                 // 执行重载,重新从第 1 页开始
                 table.reload('test', {
                     page: {
@@ -139,8 +143,8 @@
             ,url:'${ctx.contextPath}/questionExchangeCodes'
             ,cols: [[
                  // {type: 'checkbox', fixed: 'left'}
+               ,{field:'id', width:80, title: 'ID', hide: true, fixed: 'left' }
                 ,{type: 'numbers', title: '序号', width: 40, fixed: 'left' }//序号列
-                ,{field:'id', width:80, title: 'ID', hide: true, fixed: 'left' }
                 ,{field:'code', width:300, title: '兑换码', fixed: 'left' }
                 ,{field:'createTime', width:180, title: '生成时间'}
                 ,{field:'deadline', width:120, title: '截止兑换日'}
