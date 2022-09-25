@@ -261,7 +261,6 @@
                     }
                 },
                 error:function(res) {
-                    debugger
                     layer.alert(res.responseJSON.message, {icon: 5});
                 },
                 complete: function () {

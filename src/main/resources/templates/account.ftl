@@ -204,7 +204,6 @@
             return false;
         }
 
-        debugger;
         postdata = {"account": account, "cookie": Base64.encode(cookie)}
 
         layer.load();

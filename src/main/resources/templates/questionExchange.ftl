@@ -73,7 +73,7 @@
                 receiveEmail: receiveEmail,
             }
             // layer.load();
-            layer.msg("系统已收到您的请求，若您在3分钟后还没有收到邮件，请联系客服", {icon: 1, time: 5000}, function(){
+            layer.msg("系统已收到您的请求，若您在5分钟后还没有收到邮件，请联系客服", {icon: 1, time: 5000}, function(){
             });
             $.ajax({
                 url: "${ctx.contextPath}/py/exchangeDownload",
@@ -84,8 +84,20 @@
                 data: JSON.stringify(data),
                 success: function(res){
                     if (res.code == 200) {
-                        // 兑换成功提示
-                        layer.msg("恭喜您，兑换成功，请前邮箱进行查收", {icon: 1, time: 3000}, function(){
+                        // // 兑换成功提示
+                        // layer.msg("恭喜您，兑换成功，请前邮箱进行查收", {icon: 1, time: 3000}, function(){
+                        // });
+                        file_name = res.data
+                        layer.open({
+                            type: 1
+                            ,anim: 0 //0-6的动画形式，-1不开启
+                            ,shade: 0.6
+                            ,title: '兑换成功'
+                            ,skin: 'layui-layer-rim', //加上边框
+                            area: ['400px', '200px'], //宽高
+                            content: '<div style="padding:50px;">恭喜您，兑换成功，请前邮箱进行查收。' +
+                                '</br><a target="_blank" href="${ctx.contextPath}/py/'
+                                + file_name + '">点我下载</a></div>'
                         });
                     } else {
                         layer.alert(res.message, {icon: 5});
