@@ -53,5 +53,5 @@ public interface ExchangeCodeService {
 
     boolean removeMemberOnGrammarly(ExchangeCode exchangeCode, GrammarlyAccount grammarlyAccount);
 
-    List<ExchangeCode> findByExchangeStatusFalseAndExchangeDeadlineBetween(Date sdate, Date edate);
+    List<ExchangeCode> findByExchangeStatusFalseAndExchangeExpireStatusFalseAndExchangeDeadlineBetween(Date sdate, Date edate);
 }

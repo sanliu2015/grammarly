@@ -198,8 +198,8 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
     }
 
     @Override
-    public List<ExchangeCode> findByExchangeStatusFalseAndExchangeDeadlineBetween(Date sdate, Date edate) {
-        return exchangeCodeRepository.findByExchangeStatusFalseAndExchangeDeadlineBetween(sdate, edate);
+    public List<ExchangeCode> findByExchangeStatusFalseAndExchangeExpireStatusFalseAndExchangeDeadlineBetween(Date sdate, Date edate) {
+        return exchangeCodeRepository.findByExchangeStatusFalseAndExchangeExpireStatusFalseAndExchangeDeadlineBetween(sdate, edate);
     }
 
     @Override

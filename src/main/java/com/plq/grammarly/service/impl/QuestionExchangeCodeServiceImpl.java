@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -46,5 +47,34 @@ public class QuestionExchangeCodeServiceImpl implements QuestionExchangeCodeServ
         result.put("code", 0);
         result.put("msg", "");
         return result;
+    }
+
+    @Override
+    public void batchUpdateExpire(String expireDate) {
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                // python插入的没有_class属性
+                .withIgnorePaths("_class")
+                .withStringMatcher(ExampleMatcher.StringMatcher.EXACT);
+        QuestionExchangeCode questionExchangeCode = new QuestionExchangeCode();
+        questionExchangeCode.setStatus("0");
+        questionExchangeCode.setDeadline(expireDate);
+        Example example = Example.of(questionExchangeCode, matcher);
+        List<QuestionExchangeCode> dataList = questionExchangeCodeRepository.findAll(example);
+        if (dataList != null) {
+            for (QuestionExchangeCode obj : dataList) {
+                obj.setStatus("3");
+                questionExchangeCodeRepository.save(obj);
+            }
+        }
+    }
+
+    @Override
+    public void updateObj(QuestionExchangeCode questionExchangeCode) {
+        questionExchangeCodeRepository.save(questionExchangeCode);
+    }
+
+    @Override
+    public List<QuestionExchangeCode> findByDeadlineLessThanAndStatus(String day, String status) {
+        return questionExchangeCodeRepository.findByDeadlineLessThanAndStatus(day, status);
     }
 }

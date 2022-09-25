@@ -11,14 +11,14 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
-import cn.hutool.http.HttpUtil;
 import com.plq.grammarly.model.entity.ExchangeCode;
 import com.plq.grammarly.model.entity.GrammarlyAccount;
+import com.plq.grammarly.model.entity.QuestionExchangeCode;
 import com.plq.grammarly.service.ExchangeCodeService;
 import com.plq.grammarly.service.GrammarlyAccountService;
+import com.plq.grammarly.service.QuestionExchangeCodeService;
 import com.plq.grammarly.util.BizUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,21 +32,23 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-@Profile("pro")
 public class GrammarlyTask {
 
     private final GrammarlyAccountService grammarlyAccountService;
     private final ExchangeCodeService exchangeCodeService;
+    private final QuestionExchangeCodeService questionExchangeCodeService;
 
-    public GrammarlyTask(GrammarlyAccountService grammarlyAccountService, ExchangeCodeService exchangeCodeService) {
+    public GrammarlyTask(GrammarlyAccountService grammarlyAccountService, ExchangeCodeService exchangeCodeService, QuestionExchangeCodeService questionExchangeCodeService) {
         this.grammarlyAccountService = grammarlyAccountService;
         this.exchangeCodeService = exchangeCodeService;
+        this.questionExchangeCodeService = questionExchangeCodeService;
     }
 
     /**
      * 每20分钟执行
      */
     @Scheduled(fixedRate = 1000L*60*20)
+    @Profile("pro")
     public void keepHeartbeat() {
         List<GrammarlyAccount> grammarlyAccountList = grammarlyAccountService.listAll();
         for (GrammarlyAccount grammarlyAccount : grammarlyAccountList) {
@@ -88,14 +90,14 @@ public class GrammarlyTask {
     /**
      * 兑换截至日期过期状态
      */
-    @Scheduled(cron = "10 0 0 * * ?")
+    @Scheduled(cron = "15 0 0 * * ?")
     public void exchangeExpire() {
         try {
             Date now = new Date();
             String day = DateUtil.format(now, "yyyy-MM-dd");
             Date sdate = DateUtil.parse(day + " 00:00:00", "yyyy-MM-dd HH:mm:ss");
             Date edate = DateUtil.parse(day + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
-            List<ExchangeCode> exchangeCodes = exchangeCodeService.findByExchangeStatusFalseAndExchangeDeadlineBetween(sdate, edate);
+            List<ExchangeCode> exchangeCodes = exchangeCodeService.findByExchangeStatusFalseAndExchangeExpireStatusFalseAndExchangeDeadlineBetween(sdate, edate);
             for (ExchangeCode exchangeCode : exchangeCodes) {
                 exchangeCode.setExchangeExpireStatus(true);
                 exchangeCodeService.updateObj(exchangeCode);
@@ -104,6 +106,20 @@ public class GrammarlyTask {
             log.error("更新兑换过期状态任务出现异常");
         }
     }
+
+
+    @Scheduled(cron = "5 0 0 * * ?")
+    public void questionExhangeCodeExpire() {
+        try {
+            String day = DateUtil.format(new Date(), "yyyy-MM-dd");
+            questionExchangeCodeService.batchUpdateExpire(day);
+        } catch (Exception e) {
+            log.error("更新解锁兑换码过期状态任务出现异常");
+        }
+
+    }
+
+
 
     /**
      * 启动把所有未兑换且逾期的兑换过期状态职位true
@@ -114,12 +130,19 @@ public class GrammarlyTask {
         String day = DateUtil.format(now, "yyyy-MM-dd");
         Date sdate = DateUtil.parse("2021-06-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
         Date edate = DateUtil.parse(day + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
-        List<ExchangeCode> exchangeCodes = exchangeCodeService.findByExchangeStatusFalseAndExchangeDeadlineBetween(sdate, edate);
-        for (ExchangeCode exchangeCode : exchangeCodes) {
-            if (exchangeCode.getExchangeExpireStatus() == null || exchangeCode.getExchangeExpireStatus() == false) {
+        List<ExchangeCode> exchangeCodes = exchangeCodeService.findByExchangeStatusFalseAndExchangeExpireStatusFalseAndExchangeDeadlineBetween(sdate, edate);
+        if (exchangeCodes != null) {
+            for (ExchangeCode exchangeCode : exchangeCodes) {
                 exchangeCode.setUpdateTime(now);
                 exchangeCode.setExchangeExpireStatus(true);
                 exchangeCodeService.updateObj(exchangeCode);
+            }
+        }
+        List<QuestionExchangeCode> questionExchangeCodes = questionExchangeCodeService.findByDeadlineLessThanAndStatus(day, "0");
+        if (questionExchangeCodes != null) {
+            for (QuestionExchangeCode questionExchangeCode : questionExchangeCodes) {
+                questionExchangeCode.setStatus("3");
+                questionExchangeCodeService.updateObj(questionExchangeCode);
             }
         }
     }
