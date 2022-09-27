@@ -152,7 +152,7 @@ class GrammarlyApplicationTests {
 		String day = DateUtil.format(now, "yyyy-MM-dd");
 		Date sdate = DateUtil.parse("2021-06-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
 		Date edate = DateUtil.parse(day + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
-		List<ExchangeCode> exchangeCodes = exchangeCodeService.findByExchangeStatusFalseAndExchangeDeadlineBetween(sdate, edate);
+		List<ExchangeCode> exchangeCodes = exchangeCodeService.findByExchangeStatusFalseAndExchangeExpireStatusFalseAndExchangeDeadlineBetween(sdate, edate);
 		for (ExchangeCode exchangeCode : exchangeCodes) {
 			exchangeCode.setExchangeExpireStatus(true);
 			exchangeCodeService.updateObj(exchangeCode);
