@@ -90,8 +90,8 @@
             number: number,
             email: email
         }
-        // layer.load();
         layer.confirm('确定激活账号邮箱是' + email, function(index){
+            layer.load();
             $.ajax({
                 url: "${ctx.contextPath}/exchangeCode/exchange",
                 type: "post",
@@ -113,7 +113,7 @@
                     layer.alert(res.responseJSON.message, {icon: 5});
                 },
                 complete: function () {
-                    // layer.closeAll('loading');
+                    layer.closeAll('loading');
                 }
             });
         });
