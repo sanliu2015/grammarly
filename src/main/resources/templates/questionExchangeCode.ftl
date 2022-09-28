@@ -143,11 +143,12 @@
             ,url:'${ctx.contextPath}/questionExchangeCodes'
             ,cols: [[
                  // {type: 'checkbox', fixed: 'left'}
-               ,{field:'id', width:80, title: 'ID', hide: true, fixed: 'left' }
+                ,{field:'id', width:80, title: 'ID', hide: true, fixed: 'left' }
                 ,{type: 'numbers', title: '序号', width: 40, fixed: 'left' }//序号列
                 ,{field:'code', width:300, title: '兑换码', fixed: 'left' }
                 ,{field:'createTime', width:180, title: '生成时间'}
                 ,{field:'deadline', width:120, title: '截止兑换日'}
+                ,{field:'receiveEmail', minWidth: 200, title: '接收邮箱'}
                 ,{field:'status', width:90, title: '兑换状态'
                    , templet: function(d){
                     if (d.status == '0') {
@@ -160,8 +161,8 @@
                         return '兑换过期'
                     }
                    }}
-                ,{field:'receiveEmail', minWidth: 200, title: '接收邮箱'}
                 ,{field:'updateTime', width:180, title: '兑换时间'}
+                ,{field:'errmsg', minWidth: 200, title: '出错详情'}
                 // ,{field:'account', width:200, title: '解锁账号'}
             ]]
             ,page: true

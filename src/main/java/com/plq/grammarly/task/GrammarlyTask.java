@@ -35,6 +35,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
+@Profile("pro")
 public class GrammarlyTask {
 
     private final GrammarlyAccountService grammarlyAccountService;
@@ -51,7 +52,6 @@ public class GrammarlyTask {
      * 每20分钟执行
      */
     @Scheduled(fixedRate = 1000L*60*20)
-    @Profile("pro")
     public void keepHeartbeat() {
         List<GrammarlyAccount> grammarlyAccountList = grammarlyAccountService.listAll();
         for (GrammarlyAccount grammarlyAccount : grammarlyAccountList) {

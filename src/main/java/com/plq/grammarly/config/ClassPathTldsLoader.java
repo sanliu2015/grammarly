@@ -2,7 +2,6 @@ package com.plq.grammarly.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
-import org.yaml.snakeyaml.util.ArrayUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
