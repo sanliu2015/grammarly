@@ -121,17 +121,17 @@ public class GrammarlyTask {
         }
     }
 
-    @Scheduled(cron = "25 0/20 * * * ?")
-    public void turnToUrlHeart() {
-        try {
-            Map<String, String> body = new HashMap<>();
-            HttpUtil.createPost("http://localhost:5000/py/turnToUrl")
-                    .body(JSONUtil.toJsonStr(body))
-                    .executeAsync();
-        } catch (Exception e) {
-            log.error("turnToUrlHeart任务出现异常", e);
-        }
-    }
+//    @Scheduled(cron = "25 0/20 * * * ?")
+//    public void turnToUrlHeart() {
+//        try {
+//            Map<String, String> body = new HashMap<>();
+//            HttpUtil.createPost("http://localhost:5000/py/turnToUrl")
+//                    .body(JSONUtil.toJsonStr(body))
+//                    .executeAsync();
+//        } catch (Exception e) {
+//            log.error("turnToUrlHeart任务出现异常", e);
+//        }
+//    }
 
 
 
@@ -139,7 +139,8 @@ public class GrammarlyTask {
      * 启动把所有未兑换且逾期的兑换过期状态职位true
      */
     @PostConstruct
-    void init() {
+    public void init() {
+        removeMember();
         Date now = new Date();
         String day = DateUtil.format(now, "yyyy-MM-dd");
         Date sdate = DateUtil.parse("2021-06-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
