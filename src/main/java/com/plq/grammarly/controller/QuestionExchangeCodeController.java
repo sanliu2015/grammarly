@@ -1,5 +1,6 @@
 package com.plq.grammarly.controller;
 
+import com.plq.grammarly.exception.CustomException;
 import com.plq.grammarly.model.entity.ExchangeCode;
 import com.plq.grammarly.model.vo.ExchangeCodeQueryVO;
 import com.plq.grammarly.model.vo.ExchangeParamVO;
@@ -73,6 +74,9 @@ public class QuestionExchangeCodeController {
     @PostMapping("/questionExchangeCode/exchange")
     @ResponseBody
     public Result exchange(@RequestBody @Validated QuestionExchangeParamVO questionExchangeParamVO) {
+        if (!questionExchangeParamVO.getQuestionUrl().toLowerCase().contains("www.coursehero.com")) {
+            throw new CustomException("问题url域名必须是www.coursehero.com");
+        }
         return questionExchangeCodeService.exchange(questionExchangeParamVO);
     }
 

@@ -7,6 +7,8 @@ public interface SeleniumService {
 
     void initEdgeSession();
 
+    void destoryEdgeSession();
+
     /**
      * 解锁coursehero问题并下载
      * @param questionExchangeCode

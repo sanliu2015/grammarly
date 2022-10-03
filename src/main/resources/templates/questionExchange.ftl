@@ -45,6 +45,7 @@
         <div class="form-group">
             <div class="col-sm-offset-4 col-sm-8">
                 <button type="button" class="btn btn-success" onclick="submitForm()">确 定</button>
+                <p class="bg-danger" style="padding: 15px; display: none" id="tips">若您在提交请求5分钟后还没有收到邮件，请联系客服</p>
             </div>
         </div>
     </form>
@@ -72,9 +73,8 @@
                 questionUrl: questionUrl,
                 receiveEmail: receiveEmail,
             }
-            layer.msg("系统已收到您的请求，若您在5分钟后还没有收到邮件，请联系客服", {icon: 1, time: 5000}, function(){
-            });
             layer.load();
+            $("#tips").show(1000);
             $.ajax({
                 url: "${ctx.contextPath}/questionExchangeCode/exchange",
                 type: "post",
@@ -91,8 +91,8 @@
                             ,shade: 0.6
                             ,title: '兑换成功'
                             ,skin: 'layui-layer-rim', //加上边框
-                            area: ['400px', '200px'], //宽高
-                            content: '<div style="padding:50px;">恭喜您，兑换成功，请前邮箱进行查收或者点击下面链接下载' +
+                            area: ['480px', '240px'], //宽高
+                            content: '<div style="padding:50px;">兑换成功，结果已发送至您的邮箱或者点击下面链接下载' +
                                 '</br><a target="_blank" href="${ctx.contextPath}/file/download/'
                                 + file_name + '">点我下载</a></div>'
                         });

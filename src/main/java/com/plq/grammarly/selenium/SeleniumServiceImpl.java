@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -57,9 +58,22 @@ public class SeleniumServiceImpl implements SeleniumService {
             options.setPageLoadStrategy(PageLoadStrategy.NORMAL);
             options.setImplicitWaitTimeout(Duration.ofSeconds(10L));
             driver = new EdgeDriver(options);
-            driver.get("https://www.coursehero.com/");
+//            driver.get("https://www.coursehero.com/");
+            driver.get("https://bot.sannysoft.com/");
+            log.info("初始化edge selenium驱动成功");
         } catch (Exception e) {
             log.error("初始化edge selenium驱动失败", e);
+        }
+    }
+
+    @PreDestroy
+    @Override
+    public void destoryEdgeSession() {
+        try {
+            driver.quit();
+            log.info("销毁edge selenium驱动成功");
+        } catch (Exception e) {
+            log.error("销毁edge selenium驱动失败", e);
         }
     }
 

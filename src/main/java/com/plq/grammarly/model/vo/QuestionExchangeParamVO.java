@@ -19,7 +19,6 @@ public class QuestionExchangeParamVO {
     private String receiveEmail;
 
     @NotNull(message = "问题url不能为空")
-    @Pattern(regexp = "^(https://www.coursehero.com*)$", message = "问题url必须以https://www.coursehero.com开头")
     private String questionUrl;
 
 }
