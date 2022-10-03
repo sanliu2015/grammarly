@@ -6,3 +6,6 @@ spring:
         mongodb:
             database: grammarly
             auto-index-creation: true
+
+downloadDir: C:/Users/plq/Downloads/
+fileSaveDir: D:/selenium/download/

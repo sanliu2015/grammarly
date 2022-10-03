@@ -4,10 +4,13 @@ import com.plq.grammarly.model.entity.ExchangeCode;
 import com.plq.grammarly.model.vo.ExchangeCodeQueryVO;
 import com.plq.grammarly.model.vo.ExchangeParamVO;
 import com.plq.grammarly.model.vo.GenParamVO;
+import com.plq.grammarly.model.vo.QuestionExchangeCodeGenParamVO;
 import com.plq.grammarly.model.vo.QuestionExchangeCodeQueryVO;
+import com.plq.grammarly.model.vo.QuestionExchangeParamVO;
 import com.plq.grammarly.service.ExchangeCodeService;
 import com.plq.grammarly.service.QuestionExchangeCodeService;
 import com.plq.grammarly.util.Result;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,10 +51,29 @@ public class QuestionExchangeCodeController {
         return "questionExchangeCode";
     }
 
+    /**
+     * 生成兑换码
+     * @param genParamVO
+     * @return
+     */
+    @PostMapping("/questionExchangeCode/gen")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @ResponseBody
+    public Result gen(@RequestBody @Validated QuestionExchangeCodeGenParamVO genParamVO) {
+        Set<String> numbers = questionExchangeCodeService.gen(genParamVO);
+        return Result.success(numbers);
+    }
+
     @GetMapping("/questionExchangeCodes")
     @ResponseBody
     public Map<String, Object> pageQuery(QuestionExchangeCodeQueryVO questionExchangeCodeQueryVO) {
         return questionExchangeCodeService.pageQuery(questionExchangeCodeQueryVO);
+    }
+
+    @PostMapping("/questionExchangeCode/exchange")
+    @ResponseBody
+    public Result exchange(@RequestBody @Validated QuestionExchangeParamVO questionExchangeParamVO) {
+        return questionExchangeCodeService.exchange(questionExchangeParamVO);
     }
 
 

@@ -74,7 +74,8 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity httpSecurity)throws Exception {
         return httpSecurity.cors().disable().csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/login", "/api/v1/login", "/webjars/**", "/exchangeCode/exchange", "/index", "/", "/questionExchange").permitAll()
+                .antMatchers("/login", "/api/v1/login", "/webjars/**", "/exchangeCode/exchange", "/index", "/",
+                        "/questionExchange", "/questionExchangeCode/exchange", "/file/download/*").permitAll()
 //                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated()
                 .and().formLogin().loginPage("/index")                      //登陆页面

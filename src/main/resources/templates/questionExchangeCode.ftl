@@ -181,50 +181,6 @@
             $('#exampleModal').modal('show');
         }
 
-        window.remove = function() {
-            var checkStatus = table.checkStatus('test');
-            if (checkStatus.data.length === 0) {
-                layer.msg('请选择一行');
-                return;
-            }
-            var data = checkStatus.data; //获取选中的数据
-            var ids = [];
-            for (let row of data) {
-                ids.push(row.id);
-            }
-            layer.prompt(function(val,index){
-                layer.load();
-                $.ajax({
-                    url: "${ctx.contextPath}/exchangeCode?reason=" + val,
-                    type: "delete",
-                    contentType: 'application/json',
-                    cache: false,
-                    dataType: "json",
-                    data: JSON.stringify(ids),
-                    success: function(res){
-                        if (res.code == 200) {
-                            if (res.data) {
-                                layer.msg('删除成功!', {icon: 1, time: 1000}, function(){
-                                    $('.demoTable .layui-btn').trigger("click");
-                                });
-                            } else {
-                                layer.alert('删除失败，详见后台日志', {icon: 5, time: 5000});
-                            }
-                        } else {
-                            layer.alert(res.msg, {icon: 5});
-                        }
-                    },
-                    error:function(res) {
-                        layer.alert(res.responseJSON.message, {icon: 5});
-                    },
-                    complete: function () {
-                        layer.closeAll('loading');
-                    }
-                });
-                layer.close(index);
-            });
-        }
-
         window.mysubmit = function() {
             let count = $("#count").val();
             if (count === "") {
@@ -232,10 +188,6 @@
                 return false;
             }
             let deadline = $("#deadline").val();
-            // if (deadline === "") {
-            //     layer.msg("截止兑换日期不能为空", function(){});
-            //     return false;
-            // }
             let data = {
                 count: count,
                 deadline: deadline
@@ -243,7 +195,7 @@
             layer.load();
             $("#result").empty();
             $.ajax({
-                url: "${ctx.contextPath}/py/questionExchangeCode/gen",
+                url: "${ctx.contextPath}/questionExchangeCode/gen",
                 type: "post",
                 contentType: 'application/json',
                 cache: false,

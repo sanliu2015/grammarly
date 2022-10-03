@@ -60,7 +60,6 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
 //    @Transactional(rollbackFor = Exception.class)
     public Set<String> gen(GenParamVO genParamVO) {
         Set<String> numbers = new HashSet<>(genParamVO.getCount());
-        Set<ExchangeCode> exchangeCodes = new HashSet<>();
         int genCount = 0;
         while (genCount < genParamVO.getCount()) {
             String number = RandomUtil.randomString(16);
@@ -107,7 +106,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
             if (result) {
                 return Result.success("兑换成功，请前往您的邮箱进行查收！");
             } else {
-                return Result.failure("兑换过程出错，请联系商家或管理员！");
+                return Result.failure("兑换过程出错，请联系客服！");
             }
         }
     }
