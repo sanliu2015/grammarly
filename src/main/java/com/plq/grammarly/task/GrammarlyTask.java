@@ -1,7 +1,6 @@
 package com.plq.grammarly.task;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,15 +11,16 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
-import cn.hutool.http.HttpUtil;
-import cn.hutool.json.JSONUtil;
+import cn.hutool.json.JSONObject;
 import com.plq.grammarly.model.entity.ExchangeCode;
 import com.plq.grammarly.model.entity.GrammarlyAccount;
 import com.plq.grammarly.model.entity.QuestionExchangeCode;
+import com.plq.grammarly.selenium.SeleniumService;
 import com.plq.grammarly.service.ExchangeCodeService;
 import com.plq.grammarly.service.GrammarlyAccountService;
 import com.plq.grammarly.service.QuestionExchangeCodeService;
 import com.plq.grammarly.util.BizUtil;
+import com.plq.grammarly.util.DingTalkRobot;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -42,10 +42,13 @@ public class GrammarlyTask {
     private final ExchangeCodeService exchangeCodeService;
     private final QuestionExchangeCodeService questionExchangeCodeService;
 
-    public GrammarlyTask(GrammarlyAccountService grammarlyAccountService, ExchangeCodeService exchangeCodeService, QuestionExchangeCodeService questionExchangeCodeService) {
+    private final SeleniumService seleniumService;
+
+    public GrammarlyTask(GrammarlyAccountService grammarlyAccountService, ExchangeCodeService exchangeCodeService, QuestionExchangeCodeService questionExchangeCodeService, SeleniumService seleniumService) {
         this.grammarlyAccountService = grammarlyAccountService;
         this.exchangeCodeService = exchangeCodeService;
         this.questionExchangeCodeService = questionExchangeCodeService;
+        this.seleniumService = seleniumService;
     }
 
     /**
@@ -121,17 +124,22 @@ public class GrammarlyTask {
         }
     }
 
-//    @Scheduled(cron = "25 0/20 * * * ?")
-//    public void turnToUrlHeart() {
-//        try {
-//            Map<String, String> body = new HashMap<>();
-//            HttpUtil.createPost("http://localhost:5000/py/turnToUrl")
-//                    .body(JSONUtil.toJsonStr(body))
-//                    .executeAsync();
-//        } catch (Exception e) {
-//            log.error("turnToUrlHeart任务出现异常", e);
-//        }
-//    }
+    @Scheduled(cron = "25 0/20 * * * ?")
+    public void turnToUrlHeart() {
+        try {
+            QuestionExchangeCode questionExchangeCode = new QuestionExchangeCode();
+            questionExchangeCode.setQuestionUrl("https://www.coursehero.com/dashboard/");
+            JSONObject jsonObject = seleniumService.unlockCourseHeroQuestion(questionExchangeCode);
+            if (jsonObject.getBool("result")) {
+                DingTalkRobot.sendMsg("selenium定时刷新页面成功");
+            } else {
+                DingTalkRobot.sendMsg("selenium定时刷新页面失败" + jsonObject.getStr("errmsg"));
+            }
+        } catch (Exception e) {
+            DingTalkRobot.sendMsg("selenium定时刷新异常" + e.getMessage());
+            log.error("turnToUrlHeart任务出现异常", e);
+        }
+    }
 
 
 
