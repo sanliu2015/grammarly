@@ -39,6 +39,10 @@ public class SeleniumServiceImpl implements SeleniumService {
     @Value("${fileSaveDir}")
     private String fileSaveDir;
 
+    /**
+     * 先启动这个
+     * msedge.exe --remote-debugging-port=9333 --user-data-dir="D:\selenium\msedge_data"
+     */
     @PostConstruct
     @Override
     public void initEdgeSession() {
