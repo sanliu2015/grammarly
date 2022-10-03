@@ -88,6 +88,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
     @Override
 //    @Transactional(rollbackFor = Exception.class)
     public Result exchange(ExchangeParamVO exchangeParamVO) {
+        log.info("开始兑换：{}", exchangeParamVO.getNumber());
         Example<ExchangeCode> example = Example.of(ExchangeCode.builder().number(exchangeParamVO.getNumber()).build());
         ExchangeCode exchangeCode = exchangeCodeRepository.findOne(example).orElse(null);
         if (exchangeCode == null) {
@@ -187,6 +188,8 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
         GrammarlyAccount grammarlyAccount = grammarlyAccountService.findByAccount(exchangeCode.getInviterAccount());
         if (grammarlyAccount == null) {
             log.warn("移除失败，兑换码{}对应的邀请方账号{}详细信息没找到", exchangeCode.getNumber(), exchangeCode.getInviterAccount());
+            exchangeCode.setErrorMsg("对应的邀请方账号信息没找到");
+            exchangeCodeRepository.save(exchangeCode);
             return false;
         }
         return SpringUtil.getBean(ExchangeCodeService.class).removeMemberOnGrammarly(exchangeCode, grammarlyAccount);
