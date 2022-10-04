@@ -164,6 +164,7 @@
                 ,{field:'expireStatus', width:90, title: '会员到期'}
                 ,{field:'removeStatus', width:90, title: '会员删除', event: 'setRemoveStatus', style:'cursor: pointer;'}
                 ,{field:'inviterAccount', width:200, title: '邀请者账号'}
+                ,{field:'reason', minWidth: 100, title: '删除原因'}
                 // ,{fixed: 'right', title:'操作', toolbar: '#rowBar', width:160}
             ]]
             ,page: true

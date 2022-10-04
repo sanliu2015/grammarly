@@ -145,7 +145,7 @@
                  // {type: 'checkbox', fixed: 'left'}
                 ,{field:'id', width:80, title: 'ID', hide: true, fixed: 'left' }
                 ,{type: 'numbers', title: '序号', width: 40, fixed: 'left' }//序号列
-                ,{field:'code', width:300, title: '兑换码', fixed: 'left' }
+                ,{field:'code', width:200, title: '兑换码', fixed: 'left' }
                 ,{field:'createTime', width:180, title: '生成时间'}
                 ,{field:'deadline', width:120, title: '截止兑换日'}
                 ,{field:'receiveEmail', minWidth: 200, title: '接收邮箱'}

@@ -73,8 +73,9 @@
                 questionUrl: questionUrl,
                 receiveEmail: receiveEmail,
             }
-            layer.load();
+            layer.close(index);
             $("#tips").show(1000);
+            layer.load();
             $.ajax({
                 url: "${ctx.contextPath}/questionExchangeCode/exchange",
                 type: "post",

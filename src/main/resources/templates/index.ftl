@@ -91,6 +91,7 @@
             email: email
         }
         layer.confirm('确定激活账号邮箱是' + email, function(index){
+            layer.close(index);
             layer.load();
             $.ajax({
                 url: "${ctx.contextPath}/exchangeCode/exchange",

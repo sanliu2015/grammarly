@@ -170,7 +170,7 @@ public class QuestionExchangeCodeServiceImpl implements QuestionExchangeCodeServ
                         .code(number)
                         .status("0")
                         .deadline(genParamVO.getDeadline())
-                        .createTime(DateUtil.formatTime(new Date()))
+                        .createTime(DateUtil.formatDateTime(new Date()))
                         .build();
                 try {
                     questionExchangeCodeRepository.save(questionExchangeCode);
