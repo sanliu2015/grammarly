@@ -18,6 +18,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -30,6 +31,7 @@ import java.time.Duration;
 import java.util.Arrays;
 
 @Slf4j
+@Profile("uat")
 @Service
 public class SeleniumServiceImpl implements SeleniumService {
 
