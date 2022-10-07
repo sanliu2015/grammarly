@@ -125,7 +125,7 @@ public class GrammarlyTask {
     }
 
     @Scheduled(cron = "25 0/20 * * * ?")
-    public void turnToUrlHeart() {
+    public void seleniumHeart() {
         try {
             QuestionExchangeCode questionExchangeCode = new QuestionExchangeCode();
             questionExchangeCode.setQuestionUrl("https://www.coursehero.com/dashboard/");
