@@ -26,11 +26,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -133,8 +131,8 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
             return i;
         });
         boolean successFlag = false;
-        log.info("用户开始兑换{},所填邮箱:{},候选grammarly账号数:{}", exchangeCode.getNumber(), exchangeCode.getEmail(), accounts);
         if (accounts.size() > 0) {
+            log.info("用户开始兑换{},所填邮箱:{},候选grammarly账号数量:{}", exchangeCode.getNumber(), exchangeCode.getEmail(), accounts.size());
             List<Map<String, Object>> dataList = new ArrayList<>();
             Map<String, Object> map = new HashMap<>(16);
             map.put("email", exchangeCode.getEmail());

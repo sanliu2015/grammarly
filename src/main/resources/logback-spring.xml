@@ -168,20 +168,19 @@
     <springProfile name="default,dev,test">
         <logger name="org.springframework.web" level="INFO"/>
         <logger name="sun.rmi.loader" level="WARN"/>
-        <logger name="com.plq" level="DEBUG" additivity="false"/>
+        <logger name="com.plq" level="DEBUG"/>
         <root level="INFO">
             <appender-ref ref="ASYNC_CONSOLE" />
             <appender-ref ref="ASYNC_DEBUG_FILE" />
             <appender-ref ref="ASYNC_INFO_FILE" />
             <appender-ref ref="ASYNC_ERROR_FILE" />
         </root>
-
     </springProfile>
 
     <springProfile name="pro">
         <logger name="org.springframework.web" level="INFO"/>
         <logger name="sun.rmi.loader" level="WARN"/>
-        <logger name="com.plq" level="INFO" additivity="false"/>
+        <logger name="com.plq" level="INFO"/>
         <root level="INFO">
             <appender-ref ref="ASYNC_CONSOLE" />
             <appender-ref ref="ASYNC_INFO_FILE" />
