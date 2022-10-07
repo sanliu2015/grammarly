@@ -1,6 +1,5 @@
 package com.plq.grammarly.util;
 
-import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -14,6 +13,15 @@ public class DingTalkRobot {
         message = "【grammarly报警】" + message;
         JSONObject jsonObject = new JSONObject();
         jsonObject.putOpt("msgtype", "text").putOpt("text", new JSONObject().putOpt("content", message));
+        HttpUtil.createPost(SEND_URL)
+                .contentType("application/json")
+                .body(JSONUtil.toJsonStr(jsonObject))
+                .execute();
+    }
+
+    public static void sendMarkdownMsg(String message) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.putOpt("msgtype", "markdown").putOpt("markdown", new JSONObject().putOpt("title", "grammarly报警").putOpt("text", message));
         HttpUtil.createPost(SEND_URL)
                 .contentType("application/json")
                 .body(JSONUtil.toJsonStr(jsonObject))
