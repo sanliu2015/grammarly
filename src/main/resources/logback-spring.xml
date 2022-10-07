@@ -12,10 +12,6 @@
         <encoder>
             <pattern>%d{MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{20} - [%method,%line] - %msg%n</pattern>
         </encoder>
-        <!--此日志appender是为开发使用，只配置最底级别，控制台输出的日志级别是大于或等于此级别的日志信息-->
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>debug</level>
-        </filter>
     </appender>
 
     <!-- Log file debug output -->
@@ -59,7 +55,7 @@
             <pattern>%date [%thread] %-5level [%logger{50}] %file:%line - %msg%n</pattern>
             <charset>UTF-8</charset> <!-- 设置字符集 -->
         </encoder>
-        <!-- 此日志文档只记录INFO级别的 -->
+        <!-- 此日志文档只记录INFO级别及以上的 -->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
@@ -110,24 +106,86 @@
         可以包含零个或多个元素，标识这个appender将会添加到这个logger。
     -->
 
-    <!-- Level: FATAL 0  ERROR 3  WARN 4  INFO 6  DEBUG 7 -->
-    <root level="INFO">
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="DEBUG_FILE" />
-        <appender-ref ref="INFO_FILE" />
-        <appender-ref ref="ERROR_FILE" />
-    </root>
+    <!-- 异步输出 -->
+    <appender name="ASYNC_CONSOLE" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>256</queueSize>
+        <!-- 新增这行为了打印栈堆信息 -->
+        <includeCallerData>true</includeCallerData>
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref="CONSOLE"/>
+    </appender>
+
+    <appender name="ASYNC_DEBUG_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>256</queueSize>
+        <!-- 新增这行为了打印栈堆信息 -->
+        <includeCallerData>true</includeCallerData>
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref="DEBUG_FILE"/>
+    </appender>
+
+    <appender name="ASYNC_INFO_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>256</queueSize>
+        <!-- 新增这行为了打印栈堆信息 -->
+        <includeCallerData>true</includeCallerData>
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref="INFO_FILE"/>
+    </appender>
+
+    <appender name="ASYNC_ERROR_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>256</queueSize>
+        <!-- 新增这行为了打印栈堆信息 -->
+        <includeCallerData>true</includeCallerData>
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref="ERROR_FILE"/>
+    </appender>
+
+
+<!--    &lt;!&ndash; Level: FATAL 0  ERROR 3  WARN 4  INFO 6  DEBUG 7 &ndash;&gt;-->
+<!--    <root level="INFO">-->
+<!--        <appender-ref ref="CONSOLE" />-->
+<!--        <appender-ref ref="CONSOLE" />-->
+<!--        <appender-ref ref="DEBUG_FILE" />-->
+<!--        <appender-ref ref="INFO_FILE" />-->
+<!--        <appender-ref ref="ERROR_FILE" />-->
+<!--    </root>-->
+
+    <logger name="org.springframework" level="error"></logger>
+    <logger name="sun.rmi.loader" level="error"/>
 
     <!-- 开发、测试环境 -->
     <springProfile name="default,dev,test">
         <logger name="org.springframework.web" level="INFO"/>
         <logger name="sun.rmi.loader" level="WARN"/>
-        <logger name="com.plq" level="DEBUG" />
+        <logger name="com.plq" level="DEBUG" additivity="false"/>
+        <root level="INFO">
+            <appender-ref ref="ASYNC_CONSOLE" />
+            <appender-ref ref="ASYNC_DEBUG_FILE" />
+            <appender-ref ref="ASYNC_INFO_FILE" />
+            <appender-ref ref="ASYNC_ERROR_FILE" />
+        </root>
+
     </springProfile>
 
     <springProfile name="pro">
-        <logger name="org.springframework" level="INFO"/>
+        <logger name="org.springframework.web" level="INFO"/>
         <logger name="sun.rmi.loader" level="WARN"/>
-        <logger name="com.plq" level="INFO"/>
+        <logger name="com.plq" level="INFO" additivity="false"/>
+        <root level="INFO">
+            <appender-ref ref="ASYNC_CONSOLE" />
+            <appender-ref ref="ASYNC_INFO_FILE" />
+            <appender-ref ref="ASYNC_ERROR_FILE" />
+        </root>
     </springProfile>
 </configuration>
