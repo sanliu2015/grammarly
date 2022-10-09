@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collections;
 
 @Slf4j
 @Service
@@ -41,7 +42,7 @@ public class SeleniumServiceImpl implements SeleniumService {
     private String fileSaveDir;
 
     /**
-     * 先启动这个
+     * 命令行cmd先启动这个,前提edge加入环境变量C:\Program Files (x86)\Microsoft\Edge\Application
      * msedge.exe --remote-debugging-port=9333 --user-data-dir="D:\selenium\msedge_data"
      */
     @PostConstruct
@@ -49,9 +50,9 @@ public class SeleniumServiceImpl implements SeleniumService {
     public void initEdgeSession() {
         try {
             WebDriverManager webDriverManager = WebDriverManager.edgedriver();
-            if ("dev".equals(SpringUtil.getActiveProfile())) {
-                webDriverManager.proxy("127.0.0.1:10809");
-            }
+//            if ("dev".equals(SpringUtil.getActiveProfile())) {
+//                webDriverManager.proxy("127.0.0.1:10809");
+//            }
             webDriverManager.setup();
             EdgeOptions options = new EdgeOptions();
             options.setExperimentalOption("debuggerAddress", "127.0.0.1:9333");
@@ -59,6 +60,7 @@ public class SeleniumServiceImpl implements SeleniumService {
             options.setImplicitWaitTimeout(Duration.ofSeconds(10L));
             driver = new EdgeDriver(options);
 //            driver.get("https://www.coursehero.com/");
+//            driver.get("edge://version/");
             driver.get("https://bot.sannysoft.com/");
             log.info("初始化edge selenium驱动成功");
         } catch (Exception e) {
@@ -90,7 +92,8 @@ public class SeleniumServiceImpl implements SeleniumService {
             }
             // 先用文件解锁下载
             try {
-                driver.findElement(By.cssSelector("a[class=\"d-flex\"]")).click();
+                WebElement webElement = driver.findElement(By.cssSelector("a[class=\"d-flex\"]"));
+                webElement.click();
                 // 留10秒文件下载
                 ThreadUtil.safeSleep(10000L);
                 String downloadFile = getNewestFile(downloadDir);

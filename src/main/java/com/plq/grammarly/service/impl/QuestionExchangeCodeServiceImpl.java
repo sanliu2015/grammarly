@@ -15,6 +15,7 @@ import com.plq.grammarly.model.vo.QuestionExchangeParamVO;
 import com.plq.grammarly.repository.QuestionExchangeCodeRepository;
 import com.plq.grammarly.selenium.SeleniumService;
 import com.plq.grammarly.service.QuestionExchangeCodeService;
+import com.plq.grammarly.util.DingTalkRobot;
 import com.plq.grammarly.util.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
@@ -154,6 +155,11 @@ public class QuestionExchangeCodeServiceImpl implements QuestionExchangeCodeServ
                 questionExchangeCode.setErrmsg(result.getStr("errmsg"));
                 questionExchangeCode.setUpdateTime(DateUtil.formatDateTime(new Date()));
                 questionExchangeCodeRepository.save(questionExchangeCode);
+                StringBuilder dingMsg = new StringBuilder("### 用户解锁文件失败 \n\n> 兑换码:").append(questionExchangeCode.getCode())
+                        .append("\n\n> 邮箱:").append(questionExchangeCode.getReceiveEmail())
+                        .append("\n\n> 地址:").append(questionExchangeCode.getQuestionUrl())
+                        .append("\n\n> 出错详情:").append(result.getStr("errmsg"));
+                DingTalkRobot.sendMarkdownMsg(dingMsg.toString());
             }
         }
         return result;

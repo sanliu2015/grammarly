@@ -29,6 +29,9 @@ public class DingTalkRobot {
     }
 
     public static void main(String[] args) {
-        sendMsg("Hello,world!");
+//        sendMsg("Hello,world!");
+        StringBuilder dingMsg = new StringBuilder("### 测试markdown \n\n>兑换码:111")
+                .append("\n\n>邮箱:222");
+        DingTalkRobot.sendMarkdownMsg(dingMsg.toString());
     }
 }
