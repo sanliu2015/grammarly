@@ -15,6 +15,7 @@ public class ExchangeCodeQueryVO {
 
     private String number;
     private String email;
+    private String inviterAccount;
 
     /**
      * 兑换状态

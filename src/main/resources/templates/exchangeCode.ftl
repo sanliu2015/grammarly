@@ -43,6 +43,10 @@
         <div class="layui-inline">
             <input class="layui-input" placeholder="模糊匹配" name="email" id="email" autocomplete="off">
         </div>
+        邀请者账号：
+        <div class="layui-inline">
+            <input class="layui-input" placeholder="精确匹配" name="inviterAccount" id="inviterAccount" autocomplete="off">
+        </div>
         快捷筛选：
         <div class="layui-inline">
             <input type="checkbox" id="cond1" />未兑换且过期&nbsp;&nbsp;
@@ -124,14 +128,17 @@
                 var whereObj = {};
                 var number = $.trim($('#number').val());
                 var email = $.trim($('#email').val());
+                var inviterAccount = $.trim($('#inviterAccount').val());
                 var cond1 = $("#cond1").prop('checked');
                 var cond2 = $("#cond2").prop('checked');
-                console.log(cond1);
                 if (number != "") {
                     whereObj.number = number;
                 }
                 if (email != "") {
                     whereObj.email = email;
+                }
+                if (inviterAccount != "") {
+                    whereObj.inviterAccount = inviterAccount;
                 }
                 whereObj.cond1 = cond1;
                 whereObj.cond2 = cond2;

@@ -211,6 +211,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
         ExampleMatcher matcher = ExampleMatcher.matching()
                 .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
                 .withMatcher("number", ExampleMatcher.GenericPropertyMatchers.exact())
+                .withMatcher("inviterAccount", ExampleMatcher.GenericPropertyMatchers.exact())
                 .withMatcher("email", ExampleMatcher.GenericPropertyMatchers.ignoreCase().contains());
 //                .withMatcher("email", ExampleMatcher.GenericPropertyMatchers.ignoreCase().contains()); // 模糊搜索
 //        if (exchangeCodeQueryVO.getMemberDeadlineStart() != null) {
