@@ -1,5 +1,6 @@
 package com.plq.grammarly.config;
 
+import freemarker.ext.jsp.TaglibFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
@@ -26,6 +27,10 @@ public class ClassPathTldsLoader {
 
     @PostConstruct
     public void loadClassPathTlds() {
-        freeMarkerConfigurer.getTaglibFactory().setClasspathTlds(classPathTlds);
+        TaglibFactory taglibFactory = freeMarkerConfigurer.getTaglibFactory();
+        if (taglibFactory.getObjectWrapper() == null) {
+            taglibFactory.setObjectWrapper(freeMarkerConfigurer.getConfiguration().getObjectWrapper());
+        }
+        taglibFactory.setClasspathTlds(classPathTlds);
     }
 }
