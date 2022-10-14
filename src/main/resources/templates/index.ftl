@@ -90,7 +90,8 @@
             number: number,
             email: email
         }
-        layer.confirm('确定激活账号邮箱是' + email, function(index){
+        layer.confirm('确定激活账号邮箱是' + email+"，请仔细确认邮箱！" +
+            "兑换后不可更换！更换邮箱需要收20元手续费", function(index){
             layer.close(index);
             layer.load();
             $.ajax({
