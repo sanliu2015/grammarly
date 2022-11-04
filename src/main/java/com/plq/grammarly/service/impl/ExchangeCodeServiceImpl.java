@@ -155,6 +155,9 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                        exchangeCode.setExchangeStatus(true);
                        exchangeCode.setMemberDeadline(DateUtil.offsetDay(exchangeCode.getExchangeTime(), exchangeCode.getValidDays()));
                        exchangeCode.setErrorMsg("");
+                       log.info("grammarly账号：{}，邀请{}成功，响应码：{}，响应体：{}", grammarlyAccount.getAccount(),
+                               exchangeCode.getEmail(), httpResponse.getStatus(), httpResponse.body());
+                       break;
                    } else {
                        StringBuilder sb = new StringBuilder(exchangeCode.getErrorMsg() == null ? "" : exchangeCode.getErrorMsg());
                        sb.append("grammarly账号：").append(grammarlyAccount.getAccount())
@@ -164,7 +167,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                                exchangeCode.getEmail(), httpResponse.getStatus(), httpResponse.body());
                        exchangeCode.setErrorMsg(sb.toString());
                    }
-                   exchangeCodeRepository.save(exchangeCode);
+
                 } catch (Exception e) {
                     log.error("grammarly邀请用户网络异常", e);
                 }
@@ -172,7 +175,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
         } else {
             log.error("可用grammarly账号配置总数为0");
         }
-
+        exchangeCodeRepository.save(exchangeCode);
         if (!successFlag) {
             log.error("用户{}兑换{}失败", exchangeCode.getEmail(), exchangeCode.getNumber());
         }
