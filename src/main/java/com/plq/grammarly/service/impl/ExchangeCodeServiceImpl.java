@@ -157,6 +157,8 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                        exchangeCode.setExchangeStatus(true);
                        exchangeCode.setMemberDeadline(DateUtil.offsetDay(exchangeCode.getExchangeTime(), exchangeCode.getValidDays()));
                        exchangeCode.setErrorMsg("");
+                       log.info("grammarly账号：{}，邀请{}成功，响应码：{}，响应体：{}", grammarlyAccount.getAccount(),
+                               exchangeCode.getEmail(), httpResponse.getStatus(), httpResponse.body());
                    } else {
                        StringBuilder sb = new StringBuilder(exchangeCode.getErrorMsg() == null ? "" : exchangeCode.getErrorMsg());
                        sb.append("grammarly账号：").append(grammarlyAccount.getAccount())
