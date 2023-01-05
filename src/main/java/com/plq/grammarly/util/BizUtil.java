@@ -53,7 +53,7 @@ public class BizUtil {
                 .header("sec-ch-ua", httpRequestHeadMap.getOrDefault("sec-ch-ua", "\"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"108\", \"Google Chrome\";v=\"108\""))
                 .header("sec-ch-ua-mobile", httpRequestHeadMap.getOrDefault("sec-ch-ua-mobile", "?0"))
                 .header("content-type", "application/json")
-                .header("accept", "*/*")
+                .header("accept", "application/json")
                 .header("authority", "goldengate.grammarly.com")
                 .header("origin", "https://account.grammarly.com")
                 .header("referer", "https://account.grammarly.com/admin/members")
@@ -62,7 +62,7 @@ public class BizUtil {
                 .header("x-csrf-token", httpRequestHeadMap.get("x-csrf-token"))
                 .header("x-client-type", httpRequestHeadMap.get("x-client-type"))
                 .header("x-client-version", httpRequestHeadMap.get("x-client-version"))
-                .header("cookie", httpRequestHeadMap.get("cookie"))
+                .cookie(httpRequestHeadMap.get("cookie"))
                 ;
         if (httpRequestHeadMap.containsKey("authorization")) {
             httpRequest.header("authorization", httpRequestHeadMap.get("authorization"));
@@ -89,7 +89,7 @@ public class BizUtil {
                 .header("x-csrf-token", httpRequestHeadMap.get("x-csrf-token"))
                 .header("x-client-type", httpRequestHeadMap.get("x-client-type"))
                 .header("x-client-version", httpRequestHeadMap.get("x-client-version"))
-                .header("cookie", httpRequestHeadMap.get("cookie"))
+                .cookie(httpRequestHeadMap.get("cookie"))
                 ;
         if (httpRequestHeadMap.containsKey("authorization")) {
             httpRequest.header("authorization", httpRequestHeadMap.get("authorization"));
@@ -115,7 +115,7 @@ public class BizUtil {
                 .header("x-csrf-token", httpRequestHeadMap.get("x-csrf-token"))
                 .header("x-client-type", httpRequestHeadMap.get("x-client-type"))
                 .header("x-client-version", httpRequestHeadMap.get("x-client-version"))
-                .header("cookie", httpRequestHeadMap.get("cookie"))
+                .cookie(httpRequestHeadMap.get("cookie"))
                 ;
         if (httpRequestHeadMap.containsKey("authorization")) {
             httpRequest.header("authorization", httpRequestHeadMap.get("authorization"));
