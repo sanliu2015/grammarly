@@ -44,71 +44,83 @@ public class BizUtil {
      * @return
      */
     public static HttpRequest buildInviteHttpRequest(Map<String, String> httpRequestHeadMap) {
-        return HttpUtil.createPost("https://goldengate.grammarly.com/institution/api/institution/admin/users/add")
-                .header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36")
-                .header("sec-fetch-site", "same-site")
-                .header("sec-fetch-mode", "cors")
-                .header("sec-fetch-dest", "empty")
-                .header("accept-language", "zh-CN,zh;q=0.9")
-                .header("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"")
-                .header("sec-ch-ua-mobile", "?0")
-                .header("origin", "https://account.grammarly.com")
+        HttpRequest httpRequest = HttpUtil.createPost("https://goldengate.grammarly.com/institution/api/institution/admin/users/add")
+                .header("user-agent", httpRequestHeadMap.get("user-agent"))
+                .header("sec-fetch-site", httpRequestHeadMap.getOrDefault("sec-fetch-site", "same-site"))
+                .header("sec-fetch-mode", httpRequestHeadMap.getOrDefault("sec-fetch-site", "cors"))
+                .header("sec-fetch-dest", httpRequestHeadMap.getOrDefault("sec-fetch-dest", "empty"))
+                .header("sec-ch-ua-platform", httpRequestHeadMap.getOrDefault("sec-ch-ua-platform", "\"Windows\""))
+                .header("sec-ch-ua", httpRequestHeadMap.getOrDefault("sec-ch-ua", "\"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"108\", \"Google Chrome\";v=\"108\""))
+                .header("sec-ch-ua-mobile", httpRequestHeadMap.getOrDefault("sec-ch-ua-mobile", "?0"))
                 .header("content-type", "application/json")
                 .header("accept", "*/*")
                 .header("authority", "goldengate.grammarly.com")
+                .header("origin", "https://account.grammarly.com")
                 .header("referer", "https://account.grammarly.com/admin/members")
-                .header("accept-language", "zh-CN,zh;q=0.9")
+                .header("accept-language", httpRequestHeadMap.getOrDefault("accept-language", "zh-CN,zh;q=0.9"))
                 .header("x-container-id", httpRequestHeadMap.get("x-container-id"))
                 .header("x-csrf-token", httpRequestHeadMap.get("x-csrf-token"))
                 .header("x-client-type", httpRequestHeadMap.get("x-client-type"))
                 .header("x-client-version", httpRequestHeadMap.get("x-client-version"))
                 .header("cookie", httpRequestHeadMap.get("cookie"))
                 ;
+        if (httpRequestHeadMap.containsKey("authorization")) {
+            httpRequest.header("authorization", httpRequestHeadMap.get("authorization"));
+        }
+        return httpRequest;
     }
 
     public static HttpRequest buildRemoveHttpRequest(Map<String, String> httpRequestHeadMap) {
-        return HttpUtil.createRequest(Method.DELETE, "https://goldengate.grammarly.com/institution/api/institution/members")
-                .header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36")
-                .header("sec-fetch-site", "same-site")
-                .header("sec-fetch-mode", "cors")
-                .header("sec-fetch-dest", "empty")
-                .header("accept-language", "zh-CN,zh;q=0.9")
-                .header("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"")
-                .header("sec-ch-ua-mobile", "?0")
-                .header("origin", "https://account.grammarly.com")
+        HttpRequest httpRequest = HttpUtil.createRequest(Method.DELETE, "https://goldengate.grammarly.com/institution/api/institution/members")
+                .header("user-agent", httpRequestHeadMap.get("user-agent"))
+                .header("sec-fetch-site", httpRequestHeadMap.getOrDefault("sec-fetch-site", "same-site"))
+                .header("sec-fetch-mode", httpRequestHeadMap.getOrDefault("sec-fetch-site", "cors"))
+                .header("sec-fetch-dest", httpRequestHeadMap.getOrDefault("sec-fetch-dest", "empty"))
+                .header("sec-ch-ua-platform", httpRequestHeadMap.getOrDefault("sec-ch-ua-platform", "\"Windows\""))
+                .header("sec-ch-ua", httpRequestHeadMap.getOrDefault("sec-ch-ua", "\"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"108\", \"Google Chrome\";v=\"108\""))
+                .header("sec-ch-ua-mobile", httpRequestHeadMap.getOrDefault("sec-ch-ua-mobile", "?0"))
                 .header("content-type", "application/json")
                 .header("accept", "*/*")
                 .header("authority", "goldengate.grammarly.com")
+                .header("origin", "https://account.grammarly.com")
                 .header("referer", "https://account.grammarly.com/admin/members")
-                .header("accept-language", "zh-CN,zh;q=0.9")
+                .header("accept-language", httpRequestHeadMap.getOrDefault("accept-language", "zh-CN,zh;q=0.9"))
                 .header("x-container-id", httpRequestHeadMap.get("x-container-id"))
                 .header("x-csrf-token", httpRequestHeadMap.get("x-csrf-token"))
                 .header("x-client-type", httpRequestHeadMap.get("x-client-type"))
                 .header("x-client-version", httpRequestHeadMap.get("x-client-version"))
                 .header("cookie", httpRequestHeadMap.get("cookie"))
                 ;
+        if (httpRequestHeadMap.containsKey("authorization")) {
+            httpRequest.header("authorization", httpRequestHeadMap.get("authorization"));
+        }
+        return httpRequest;
     }
 
     public static HttpRequest buildQueryHttpRequest(Map<String, String> httpRequestHeadMap) {
-        return HttpUtil.createGet("https://goldengate.grammarly.com/institution/api/institution/members?offset=0&limit=10&order=email&order_type=asc&search=_&memberStatus=ACTIVE&memberStatus=INVITED&memberStatus=INVITE_EXPIRED")
-                .header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36")
-                .header("sec-fetch-site", "same-site")
-                .header("sec-fetch-mode", "cors")
-                .header("sec-fetch-dest", "empty")
-                .header("accept-language", "zh-CN,zh;q=0.9")
-                .header("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"")
-                .header("sec-ch-ua-mobile", "?0")
-                .header("origin", "https://account.grammarly.com")
+        HttpRequest httpRequest = HttpUtil.createGet("https://goldengate.grammarly.com/institution/api/institution/members?offset=0&limit=10&order=email&order_type=asc&search=_&memberStatus=ACTIVE&memberStatus=INVITED&memberStatus=INVITE_EXPIRED")
+                .header("user-agent", httpRequestHeadMap.get("user-agent"))
+                .header("sec-fetch-site", httpRequestHeadMap.getOrDefault("sec-fetch-site", "same-site"))
+                .header("sec-fetch-mode", httpRequestHeadMap.getOrDefault("sec-fetch-site", "cors"))
+                .header("sec-fetch-dest", httpRequestHeadMap.getOrDefault("sec-fetch-dest", "empty"))
+                .header("sec-ch-ua-platform", httpRequestHeadMap.getOrDefault("sec-ch-ua-platform", "\"Windows\""))
+                .header("sec-ch-ua", httpRequestHeadMap.getOrDefault("sec-ch-ua", "\"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"108\", \"Google Chrome\";v=\"108\""))
+                .header("sec-ch-ua-mobile", httpRequestHeadMap.getOrDefault("sec-ch-ua-mobile", "?0"))
                 .header("accept", "application/json")
                 .header("authority", "goldengate.grammarly.com")
-                .header("referer", "https://account.grammarly.com/customize/language")
-                .header("accept-language", "zh-CN,zh;q=0.9")
+                .header("origin", "https://account.grammarly.com")
+                .header("referer", "https://account.grammarly.com/admin/members")
+                .header("accept-language", httpRequestHeadMap.getOrDefault("accept-language", "zh-CN,zh;q=0.9"))
                 .header("x-container-id", httpRequestHeadMap.get("x-container-id"))
                 .header("x-csrf-token", httpRequestHeadMap.get("x-csrf-token"))
                 .header("x-client-type", httpRequestHeadMap.get("x-client-type"))
                 .header("x-client-version", httpRequestHeadMap.get("x-client-version"))
                 .header("cookie", httpRequestHeadMap.get("cookie"))
                 ;
+        if (httpRequestHeadMap.containsKey("authorization")) {
+            httpRequest.header("authorization", httpRequestHeadMap.get("authorization"));
+        }
+        return httpRequest;
     }
 
     public static void main(String[] args) {
