@@ -26,11 +26,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,7 +58,6 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
 //    @Transactional(rollbackFor = Exception.class)
     public Set<String> gen(GenParamVO genParamVO) {
         Set<String> numbers = new HashSet<>(genParamVO.getCount());
-        Set<ExchangeCode> exchangeCodes = new HashSet<>();
         int genCount = 0;
         while (genCount < genParamVO.getCount()) {
             String number = RandomUtil.randomString(16);
@@ -88,6 +85,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
     @Override
 //    @Transactional(rollbackFor = Exception.class)
     public Result exchange(ExchangeParamVO exchangeParamVO) {
+        log.info("开始兑换：{}", exchangeParamVO.getNumber());
         Example<ExchangeCode> example = Example.of(ExchangeCode.builder().number(exchangeParamVO.getNumber()).build());
         ExchangeCode exchangeCode = exchangeCodeRepository.findOne(example).orElse(null);
         if (exchangeCode == null) {
@@ -106,7 +104,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
             if (result) {
                 return Result.success("兑换成功，请前往您的邮箱进行查收！");
             } else {
-                return Result.failure("兑换过程出错，请联系商家或管理员！");
+                return Result.failure("兑换过程出错，请联系客服！");
             }
         }
     }
@@ -133,8 +131,8 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
             return i;
         });
         boolean successFlag = false;
-        log.info("用户开始兑换{},所填邮箱:{},候选grammarly账号数:{}", exchangeCode.getNumber(), exchangeCode.getEmail(), accounts);
         if (accounts.size() > 0) {
+            log.info("用户开始兑换{},所填邮箱:{},候选grammarly账号数量:{}", exchangeCode.getNumber(), exchangeCode.getEmail(), accounts.size());
             List<Map<String, Object>> dataList = new ArrayList<>();
             Map<String, Object> map = new HashMap<>(16);
             map.put("email", exchangeCode.getEmail());
@@ -189,6 +187,8 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
         GrammarlyAccount grammarlyAccount = grammarlyAccountService.findByAccount(exchangeCode.getInviterAccount());
         if (grammarlyAccount == null) {
             log.warn("移除失败，兑换码{}对应的邀请方账号{}详细信息没找到", exchangeCode.getNumber(), exchangeCode.getInviterAccount());
+            exchangeCode.setErrorMsg("对应的邀请方账号信息没找到");
+            exchangeCodeRepository.save(exchangeCode);
             return false;
         }
         return SpringUtil.getBean(ExchangeCodeService.class).removeMemberOnGrammarly(exchangeCode, grammarlyAccount);
@@ -200,8 +200,8 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
     }
 
     @Override
-    public List<ExchangeCode> findByExchangeStatusFalseAndExchangeDeadlineBetween(Date sdate, Date edate) {
-        return exchangeCodeRepository.findByExchangeStatusFalseAndExchangeDeadlineBetween(sdate, edate);
+    public List<ExchangeCode> findByExchangeStatusFalseAndExchangeExpireStatusFalseAndExchangeDeadlineBetween(Date sdate, Date edate) {
+        return exchangeCodeRepository.findByExchangeStatusFalseAndExchangeExpireStatusFalseAndExchangeDeadlineBetween(sdate, edate);
     }
 
     @Override

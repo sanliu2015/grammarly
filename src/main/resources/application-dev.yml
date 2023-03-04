@@ -11,7 +11,15 @@ spring:
 #            authentication-database: admin
 #            password: 4qlPi9zeL1dqhtJ8
             auto-index-creation: true
+    mail:
+        properties:
+            mail:
+                smtp:
+                    debug: true
 
 logging:
     level:
         org.springframework.data.mongodb.core: DEBUG
+
+downloadDir: C:/Users/plq/Downloads/
+fileSaveDir: D:/selenium/download/

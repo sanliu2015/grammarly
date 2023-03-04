@@ -20,6 +20,7 @@
     <script src="${ctx.contextPath}/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="${ctx.contextPath}/webjars/layer/dist/layer.js"></script>
     <script src="${ctx.contextPath}/webjars/js-cookie/2.2.1/js.cookie.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-base64@3.7.2/base64.min.js"></script>
 </head>
 <body>
 <div class="container">
@@ -30,6 +31,7 @@
     </div>
     <div style="margin-top: 50px">
         <button type="button" class="btn btn-primary" onclick="add()">新增</button>
+<#--        <button type="button" class="btn btn-primary" onclick="setunlock()">设置解锁页面用户凭证</button>-->
     </div>
 
     <table class="table table-bordered">
@@ -95,6 +97,32 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="unlockModal" tabindex="-1" role="dialog" aria-labelledby="unlockModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="exampleModalLabel">coursehero账户身份信息</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="number" class="control-label">coursehero账号:</label>
+                            <input type="text" class="form-control" id="course_account">
+                        </div>
+                        <div class="form-group">
+                            <label for="number" class="control-label">cookie:</label>
+                            <input type="text" class="form-control" id="course_cookie" placeholder="登录后网站cookie值">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关 闭</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAccountCookie()">保 存</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script type="text/javascript">
     var record = {};
@@ -131,6 +159,77 @@
         $("#accountType").val("0");
         $('#exampleModal').modal('show');
         record = {};
+    }
+    function setunlock() {
+        layer.load();
+        $.ajax({
+            url: "http://localhost:5000/py/questionExchangeAccount",
+            type: "get",
+            contentType: 'application/json',
+            cache: false,
+            dataType: "json",
+            success: function(res){
+                if (res.code == 200) {
+                    var dataObj = res.data
+                    if (dataObj) {
+                        $("#course_account").val(dataObj.account);
+                        $("#course_cookie").val(dataObj.cookie);
+                    } else {
+                        $("#course_account").val();
+                        $("#course_cookie").val();
+                    }
+                    $('#unlockModal').modal('show');
+                } else {
+                    layer.alert(res.message, {icon: 5});
+                }
+            },
+            error:function(res) {
+                layer.alert(res.responseJSON.message, {icon: 5});
+            },
+            complete: function () {
+                layer.closeAll('loading');
+            }
+        });
+    }
+    function saveAccountCookie() {
+        let account = $.trim($("#course_account").val());
+        if (account === "") {
+            layer.msg("coursehero账号不能为空", function(){});
+            return false;
+        }
+
+        let cookie = $("#course_cookie").val();
+        if (cookie === "") {
+            layer.msg("cookie不能为空", function(){});
+            return false;
+        }
+
+        postdata = {"account": account, "cookie": Base64.encode(cookie)}
+
+        layer.load();
+        $.ajax({
+            url: "http://localhost:5000/py/saveAccountCookie",
+            type: "post",
+            contentType: 'application/json',
+            cache: false,
+            dataType: "json",
+            data: JSON.stringify(postdata),
+            success: function(res){
+                if (res.code == 200) {
+                    layer.msg('操作成功!', {icon: 1, time: 1000}, function(){
+                    });
+                    $('#unlockModal').modal('hide');
+                } else {
+                    layer.alert(res.message, {icon: 5});
+                }
+            },
+            error:function(res) {
+                layer.alert(res.responseJSON.message, {icon: 5});
+            },
+            complete: function () {
+                layer.closeAll('loading');
+            }
+        });
     }
     function saveAccount() {
         let account = $.trim($("#account").val());

@@ -50,6 +50,15 @@ public class UserServiceImpl implements UserDetailsService {
                     .active(true).build();
             userRepository.insert(newUser);
         }
+        Optional<User> user1 = userRepository.findByUsername("grammarly");
+        if (!user1.isPresent()) {
+            User newUser = User.builder()
+                    .username("grammarly")
+                    .password("$2a$10$OQIA/5usjetfnZHxASsYi.xzyFRHqyepoUv.S59/XCR9.eOP.kUC2")
+                    .roles("ROLE_COMMON")
+                    .active(true).build();
+            userRepository.insert(newUser);
+        }
     }
 
     public void modifyPwd(AuthenticationRequest authenticationRequest) {

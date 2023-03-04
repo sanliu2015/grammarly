@@ -2,6 +2,7 @@ package com.plq.grammarly.util;
 
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
+import cn.hutool.http.Method;
 import cn.hutool.json.JSONUtil;
 import com.plq.grammarly.model.entity.GrammarlyAccount;
 
@@ -66,7 +67,7 @@ public class BizUtil {
     }
 
     public static HttpRequest buildRemoveHttpRequest(Map<String, String> httpRequestHeadMap) {
-        return HttpUtil.createPost("https://goldengate.grammarly.com/institution/api/institution/admin/users/delete")
+        return HttpUtil.createRequest(Method.DELETE, "https://goldengate.grammarly.com/institution/api/institution/members")
                 .header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36")
                 .header("sec-fetch-site", "same-site")
                 .header("sec-fetch-mode", "cors")
@@ -89,7 +90,7 @@ public class BizUtil {
     }
 
     public static HttpRequest buildQueryHttpRequest(Map<String, String> httpRequestHeadMap) {
-        return HttpUtil.createGet("https://goldengate.grammarly.com/institution/api/institution/admin/users/find_all?offset=0&limit=10&order=email&order_type=asc&type=Invited")
+        return HttpUtil.createGet("https://goldengate.grammarly.com/institution/api/institution/members?offset=0&limit=10&order=email&order_type=asc&search=_&memberStatus=ACTIVE&memberStatus=INVITED&memberStatus=INVITE_EXPIRED")
                 .header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36")
                 .header("sec-fetch-site", "same-site")
                 .header("sec-fetch-mode", "cors")

@@ -3,6 +3,9 @@ package com.plq.grammarly;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
+import com.google.common.collect.Lists;
+import com.plq.grammarly.email.MailRequest;
+import com.plq.grammarly.email.SendMailService;
 import com.plq.grammarly.model.entity.ExchangeCode;
 import com.plq.grammarly.model.entity.GrammarlyAccount;
 import com.plq.grammarly.model.vo.GenParamVO;
@@ -26,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Profile("uat")
+@Profile("dev")
 @SpringBootTest
 @Slf4j
 class GrammarlyApplicationTests {
@@ -41,6 +44,8 @@ class GrammarlyApplicationTests {
 	private GrammarlyAccountRepository grammarlyAccountRepository;
 //	@Autowired
 //	private GrammarlyTask grammarlyTask;
+	@Autowired
+	private SendMailService sendMailService;
 
 	@Test
 	void contextLoads() {
@@ -152,11 +157,23 @@ class GrammarlyApplicationTests {
 		String day = DateUtil.format(now, "yyyy-MM-dd");
 		Date sdate = DateUtil.parse("2021-06-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
 		Date edate = DateUtil.parse(day + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
-		List<ExchangeCode> exchangeCodes = exchangeCodeService.findByExchangeStatusFalseAndExchangeDeadlineBetween(sdate, edate);
+		List<ExchangeCode> exchangeCodes = exchangeCodeService.findByExchangeStatusFalseAndExchangeExpireStatusFalseAndExchangeDeadlineBetween(sdate, edate);
 		for (ExchangeCode exchangeCode : exchangeCodes) {
 			exchangeCode.setExchangeExpireStatus(true);
 			exchangeCodeService.updateObj(exchangeCode);
 		}
+	}
+
+	@Test
+	void testSendHtmlMail() {
+		MailRequest mailRequest = MailRequest.builder()
+				.subject("主题1")
+				.content("哈哈")
+				.sendTo("717208317@qq.com")
+				.bcc("luquan.peng@genesisfin.net")
+				.filePaths(Lists.newArrayList("C:\\Users\\plq\\Downloads\\修复TA基金净值_20220922.sql"))
+				.build();
+		sendMailService.sendHtmlMail(mailRequest);
 	}
 
 }

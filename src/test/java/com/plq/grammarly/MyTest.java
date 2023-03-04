@@ -1,24 +1,15 @@
 package com.plq.grammarly;
 
-import ch.qos.logback.classic.Logger;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
-import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Lists;
 import com.plq.grammarly.util.BizUtil;
-import org.junit.jupiter.api.Test;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
 
-import javax.mail.internet.MimeMessage;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * This is Description
@@ -35,8 +26,8 @@ public class MyTest {
 
     private static void testQuery() {
         try {
-            String curl = "curl 'https://institution.grammarly.com/api/institution/admin/users/find_all?offset=0&limit=100&order=email&order_type=asc&type=Removed' \\\n" +
-                    "  -H 'authority: institution.grammarly.com' \\\n" +
+            String curl = "curl 'https://gnar.grammarly.com/api/institution/admin/users/find_all?offset=0&limit=100&order=email&order_type=asc&type=Removed' \\\n" +
+                    "  -H 'authority: gnar.grammarly.com' \\\n" +
                     "  -H 'sec-ch-ua: \" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"' \\\n" +
                     "  -H 'x-csrf-token: AABJXztZJjQSn6WLWIZZPbNDKA/VDutA/myaXg' \\\n" +
                     "  -H 'x-client-version: 0.3.0-master.4784' \\\n" +
@@ -64,8 +55,8 @@ public class MyTest {
 
     private static void testinvite() {
         try {
-            String curl = "curl 'https://institution.grammarly.com/api/institution/admin/users/find_all?offset=0&limit=100&order=email&order_type=asc&type=Removed' \\\n" +
-                    "  -H 'authority: institution.grammarly.com' \\\n" +
+            String curl = "curl 'https://gnar.grammarly.com/api/institution/admin/users/find_all?offset=0&limit=100&order=email&order_type=asc&type=Removed' \\\n" +
+                    "  -H 'authority: gnar.grammarly.com' \\\n" +
                     "  -H 'sec-ch-ua: \" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"' \\\n" +
                     "  -H 'x-csrf-token: AABJXztZJjQSn6WLWIZZPbNDKA/VDutA/myaXg' \\\n" +
                     "  -H 'x-client-version: 0.3.0-master.4784' \\\n" +
@@ -103,8 +94,8 @@ public class MyTest {
 
     private static void testDelete() {
         try {
-            String curl = "curl 'https://institution.grammarly.com/api/institution/admin/users/delete' \\\n" +
-                    "  -H 'authority: institution.grammarly.com' \\\n" +
+            String curl = "curl 'https://gnar.grammarly.com/api/institution/admin/users/delete' \\\n" +
+                    "  -H 'authority: gnar.grammarly.com' \\\n" +
                     "  -H 'sec-ch-ua: \" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"' \\\n" +
                     "  -H 'x-csrf-token: AABJXztZJjQSn6WLWIZZPbNDKA/VDutA/myaXg' \\\n" +
                     "  -H 'x-client-version: 0.3.0-master.4784' \\\n" +
@@ -132,47 +123,6 @@ public class MyTest {
             httpRequest.body(JSONUtil.toJsonStr(map));
             HttpResponse httpResponse = httpRequest.execute();
             System.out.println("httpStatus:" + httpResponse.getStatus() + ",resBody:" + httpResponse.body());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void sendMailTest() {
-        String email = "penglq20200101@163.com";
-        JavaMailSenderImpl sender = new JavaMailSenderImpl();
-        sender.setPassword("YTEDNGRXSXKONTSS");
-        sender.setUsername(email);
-        sender.setHost("smtp.163.com");
-        sender.setDefaultEncoding("UTF-8");
-        Properties properties = new Properties();
-        properties.put("mail.smtp.ssl", true);
-        properties.put("mail.smtp.from", email);
-        sender.setJavaMailProperties(properties);
-        MimeMessage mimeMessage = sender.createMimeMessage();
-        try {
-            // 开启文件上传
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
-            helper.setSubject("请回复您的需求  私募管理人的『专』心管家元年金服为您服务");
-            helper.setText("<html><body>" +
-                    "<p>您好，<br />\n" +
-                    "<br />\n" +
-                    "感谢您百忙之中查看我的简历，期待与您有更多交流机会。<br />\n" +
-                    "<br />\n" +
-                    "您可以通过下列方式联系我：<br />\n" +
-                    "<br />\n" +
-                    "微信：yuannianjinfu / xiaocai157054<br />\n" +
-                    "电话：18221390682 / 15901902443<br />\n" +
-                    "<br />\n" +
-                    "也可以发我您的联系方式，我将竭力为您解决您的问题！<br />\n" +
-                    "<br />\n" +
-                    "祝好！</p>" +
-                    "<img src='cid:id1'></body></html>", true);
-            helper.setTo("717208317@qq.com");
-            helper.setFrom(email);
-            FileSystemResource res = new FileSystemResource(new File("d:/Downloads/sm.jpg"));
-            helper.addInline("id1", res);
-            sender.send(mimeMessage);
         } catch (Exception e) {
             e.printStackTrace();
         }

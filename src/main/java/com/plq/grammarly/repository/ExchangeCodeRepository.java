@@ -16,5 +16,5 @@ public interface ExchangeCodeRepository extends MongoRepository<ExchangeCode, St
 
     List<ExchangeCode> findByExchangeStatusTrueAndExpireStatusFalseAndRemoveStatusFalseAndMemberDeadlineLessThan(Date date);
 
-    List<ExchangeCode> findByExchangeStatusFalseAndExchangeDeadlineBetween(Date sdate, Date edate);
+    List<ExchangeCode> findByExchangeStatusFalseAndExchangeExpireStatusFalseAndExchangeDeadlineBetween(Date sdate, Date edate);
 }

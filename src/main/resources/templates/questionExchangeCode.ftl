@@ -37,16 +37,21 @@
     <div class="demoTable">
         兑换码：
         <div class="layui-inline">
-            <input class="layui-input" placeholder="精确匹配" name="number" id="number" autocomplete="off">
+            <input class="layui-input" placeholder="精确匹配" name="number" id="code" autocomplete="off">
         </div>
-        邮箱：
+        接收邮箱：
         <div class="layui-inline">
-            <input class="layui-input" placeholder="模糊匹配" name="email" id="email" autocomplete="off">
+            <input class="layui-input" placeholder="模糊匹配" name="receiveEmail" id="receiveEmail" autocomplete="off">
         </div>
-        快捷筛选：
-        <div class="layui-inline">
-            <input type="checkbox" id="cond1" />未兑换且过期&nbsp;&nbsp;
-            <input type="checkbox" id="cond2" />会员到期未删除
+        兑换状态：
+        <div class="layui-input-inline">
+            <select name="status" id="status">
+                <option value=""></option>
+                <option value="0">未兑换</option>
+                <option value="1">兑换成功</option>
+                <option value="2">兑换出错</option>
+                <option value="3">兑换过期</option>
+            </select>
         </div>
         <button class="layui-btn" data-type="reload">搜索</button>
     </div>
@@ -55,12 +60,8 @@
             <@sec.authorize access="hasRole('ROLE_ADMIN')">
             <button class="layui-btn layui-btn-sm" onclick="gen()">产生兑换码</button>
             </@sec.authorize>
-            <button class="layui-btn layui-btn-danger layui-btn-sm" onclick="remove()" title="未兑换的是删除记录，已兑换的不会删除记录而是删除grammarly会员">删除</button>
         </div>
     </script>
-<#--    <script type="text/html" id="rowBar">-->
-<#--        <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="edit">修改会员删除状态</a>-->
-<#--    </script>-->
     <table class="layui-hide" id="test" lay-filter="test"></table>
 
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
@@ -79,16 +80,10 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="account" class="col-sm-4 control-label"><span style="color: red">*</span>会员天数（单位：天）</label>
-                            <div class="col-sm-8">
-                                <input type="number" required class="form-control" id="validDays" placeholder="必填项，例如：31，180">
-                            </div>
-                        </div>
-                        <div class="form-group">
                             <label for="account" class="col-sm-4 control-label">截止兑换日期</label>
                             <div class="col-sm-8">
                                 <div class='input-group date' id='datetimepicker1'>
-                                    <input type="text" class="form-control" id="exchangeDeadline" placeholder="选填项：兑换截止日期">
+                                    <input type="text" class="form-control" id="deadline" placeholder="选填项：兑换截止日期">
                                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                                 </div>
                             </div>
@@ -116,25 +111,21 @@
 
 </div>
 <script type="text/javascript">
-    layui.use(['layer', 'table'], function(){
+    layui.use(['layer', 'table', 'form'], function(){
         var layer = layui.layer
             ,table = layui.table;
         var $ = layui.$, active = {
             reload: function(){
                 var whereObj = {};
-                var number = $.trim($('#number').val());
-                var email = $.trim($('#email').val());
-                var cond1 = $("#cond1").prop('checked');
-                var cond2 = $("#cond2").prop('checked');
-                console.log(cond1);
-                if (number != "") {
-                    whereObj.number = number;
+                var code = $.trim($('#code').val());
+                var receiveEmail = $.trim($('#receiveEmail').val());
+                if (code != "") {
+                    whereObj.code = code;
                 }
-                if (email != "") {
-                    whereObj.email = email;
+                if (receiveEmail != "") {
+                    whereObj.receiveEmail = receiveEmail;
                 }
-                whereObj.cond1 = cond1;
-                whereObj.cond2 = cond2;
+                whereObj.status = $("#status").val();
                 // 执行重载,重新从第 1 页开始
                 table.reload('test', {
                     page: {
@@ -149,99 +140,33 @@
        var ins1 = table.render({
             elem: '#test'
             ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
-            ,url:'${ctx.contextPath}/exchangeCodes'
+            ,url:'${ctx.contextPath}/questionExchangeCodes'
             ,cols: [[
-                 {type: 'checkbox', fixed: 'left'}
-                ,{type: 'numbers', title: '序号', width: 40, fixed: 'left' }//序号列
+                 // {type: 'checkbox', fixed: 'left'}
                 ,{field:'id', width:80, title: 'ID', hide: true, fixed: 'left' }
-                ,{field:'number', width:160, title: '兑换码', fixed: 'left' }
+                ,{type: 'numbers', title: '序号', width: 40, fixed: 'left' }//序号列
+                ,{field:'code', width:200, title: '兑换码', fixed: 'left' }
                 ,{field:'createTime', width:180, title: '生成时间'}
-                ,{field:'exchangeDeadline', width:120, title: '截止兑换日'}
-                ,{field:'exchangeStatus', width:90, title: '是否兑换', event: 'setExchangeStatus', style:'cursor: pointer;'}
-                ,{field:'exchangeTime', width:180, title: '兑换时间'}
-                ,{field:'email', minWidth: 200, title: '兑换邮箱'}
-                ,{field:'memberDeadline', title: '会员到期日', minWidth: 150}
-                ,{field:'expireStatus', width:90, title: '会员到期'}
-                ,{field:'removeStatus', width:90, title: '会员删除', event: 'setRemoveStatus', style:'cursor: pointer;'}
-                ,{field:'inviterAccount', width:200, title: '邀请者账号'}
-                ,{field:'reason', minWidth: 100, title: '删除原因'}
-                // ,{fixed: 'right', title:'操作', toolbar: '#rowBar', width:160}
+                ,{field:'deadline', width:120, title: '截止兑换日'}
+                ,{field:'receiveEmail', minWidth: 200, title: '接收邮箱'}
+                ,{field:'status', width:90, title: '兑换状态'
+                   , templet: function(d){
+                    if (d.status == '0') {
+                        return '未兑换'
+                    } else if (d.status == '1') {
+                        return '兑换成功'
+                    } else if (d.status == '2') {
+                        return '兑换出错'
+                    } else if (d.status == '3') {
+                        return '兑换过期'
+                    }
+                   }}
+                ,{field:'updateTime', width:180, title: '兑换时间'}
+                ,{field:'errmsg', minWidth: 200, title: '出错详情'}
+                // ,{field:'account', width:200, title: '解锁账号'}
             ]]
             ,page: true
             ,limits: [10,20,50,100]
-        });
-
-        //监听行工具事件
-        table.on('tool(test)', function(obj){
-            var data = obj.data;
-            //console.log(obj)
-            if(obj.event === 'del'){
-                layer.confirm('确定删除会员吗', function(index){
-                    layer.load();
-                    $.ajax({
-                        url: "${ctx.contextPath}/exchangeCode/" + data.id + "/removeMember",
-                        type: "put",
-                        contentType: 'application/json',
-                        cache: false,
-                        dataType: "json",
-                        success: function(res){
-                            if (res.code == 200) {
-                                if (res.data) {
-                                    layer.msg('删除会员操作成功!', {icon: 1, time: 1000}, function(){
-                                        $('.demoTable .layui-btn').trigger("click");
-                                    });
-                                } else {
-                                    layer.alert('删除会员失败，详见后台日志，您也可以尝试变更状态（前提grammarly账号下移除过该用户邮箱或已失效）', {icon: 5, time: 5000});
-                                }
-                            } else {
-                                layer.alert(res.msg, {icon: 5});
-                            }
-                        },
-                        error:function(res) {
-                            layer.alert(res.responseJSON.message, {icon: 5});
-                        },
-                        complete: function () {
-                            layer.closeAll('loading');
-                        }
-                    });
-                    layer.close(index);
-                });
-            } else if(obj.event === 'setRemoveStatus'){
-                layer.prompt({
-                    title: '修改会员删除状态'
-                    ,formType: 2
-                    ,value: !data.removeStatus
-                }, function(value, index){
-                    layer.load();
-                    $.ajax({
-                        url: "${ctx.contextPath}/exchangeCode/" + data.id + "/removeStatus/" + value,
-                        type: "put",
-                        contentType: 'application/json',
-                        cache: false,
-                        dataType: "json",
-                        success: function(res){
-                            if (res.code == 200) {
-                                layer.msg('变更状态操作成功!', {icon: 1, time: 1000}, function(){
-                                    $('.demoTable .layui-btn').trigger("click");
-                                });
-                            } else {
-                                layer.alert(res.msg, {icon: 5});
-                            }
-                        },
-                        error:function(res) {
-                            layer.alert(res.responseJSON.message, {icon: 5});
-                        },
-                        complete: function () {
-                            layer.closeAll('loading');
-                        }
-                    });
-                    layer.close(index);
-                });
-            } else if(obj.event === 'setExchangeStatus'){
-                if (!data.exchangeStatus && data.errorMsg) {
-                    layer.alert(data.errorMsg, {icon: 5, title: '兑换失败提示'});
-                }
-            }
         });
 
         $('.demoTable .layui-btn').on('click', function(){
@@ -251,78 +176,26 @@
 
         window.gen = function() {
             $("#count").val("");
-            $("#validDays").val("");
-            $("#exchangeDeadline").val("");
+            $("#deadline").val("");
             $("#result").empty();
             $('#exampleModal').modal('show');
-        }
-
-        window.remove = function() {
-            var checkStatus = table.checkStatus('test');
-            if (checkStatus.data.length === 0) {
-                layer.msg('请选择一行');
-                return;
-            }
-            var data = checkStatus.data; //获取选中的数据
-            var ids = [];
-            for (let row of data) {
-                ids.push(row.id);
-            }
-            layer.prompt(function(val,index){
-                layer.load();
-                $.ajax({
-                    url: "${ctx.contextPath}/exchangeCode?reason=" + val,
-                    type: "delete",
-                    contentType: 'application/json',
-                    cache: false,
-                    dataType: "json",
-                    data: JSON.stringify(ids),
-                    success: function(res){
-                        if (res.code == 200) {
-                            if (res.data) {
-                                layer.msg('删除成功!', {icon: 1, time: 1000}, function(){
-                                    $('.demoTable .layui-btn').trigger("click");
-                                });
-                            } else {
-                                layer.alert('删除失败，详见后台日志', {icon: 5, time: 5000});
-                            }
-                        } else {
-                            layer.alert(res.msg, {icon: 5});
-                        }
-                    },
-                    error:function(res) {
-                        layer.alert(res.responseJSON.message, {icon: 5});
-                    },
-                    complete: function () {
-                        layer.closeAll('loading');
-                    }
-                });
-                layer.close(index);
-            });
         }
 
         window.mysubmit = function() {
             let count = $("#count").val();
             if (count === "") {
-                layer.msg("会员天数不能为空", function(){});
-                return false;
-            }
-            let validDays = $("#validDays").val();
-            if (validDays === "") {
                 layer.msg("生成数量不能为空", function(){});
                 return false;
             }
+            let deadline = $("#deadline").val();
             let data = {
                 count: count,
-                validDays: validDays
-            }
-            if ($("#exchangeDeadline").val()) {
-                data.exchangeDeadline = $("#exchangeDeadline").val();
+                deadline: deadline
             }
             layer.load();
             $("#result").empty();
             $.ajax({
-                url: "${ctx.contextPath}/exchangeCode/gen",
+                url: "${ctx.contextPath}/questionExchangeCode/gen",
                 type: "post",
                 contentType: 'application/json',
                 cache: false,
