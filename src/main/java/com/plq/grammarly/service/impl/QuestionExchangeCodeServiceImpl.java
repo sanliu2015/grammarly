@@ -15,6 +15,7 @@ import com.plq.grammarly.model.vo.QuestionExchangeParamVO;
 import com.plq.grammarly.repository.QuestionExchangeCodeRepository;
 import com.plq.grammarly.selenium.SeleniumService;
 import com.plq.grammarly.service.QuestionExchangeCodeService;
+import com.plq.grammarly.util.DingTalkRobot;
 import com.plq.grammarly.util.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
@@ -121,12 +122,21 @@ public class QuestionExchangeCodeServiceImpl implements QuestionExchangeCodeServ
         }
         questionExchangeCode.setQuestionUrl(questionExchangeParamVO.getQuestionUrl());
         questionExchangeCode.setReceiveEmail(questionExchangeParamVO.getReceiveEmail());
+        log.info("开始兑换coursehero, 兑换码:{},接收邮箱:{},url:{}", questionExchangeParamVO.getCode(),
+                questionExchangeParamVO.getReceiveEmail(), questionExchangeParamVO.getReceiveEmail());
         JSONObject result = unlockAndSendEmail(questionExchangeCode);
         if (result.getBool("result")) {
+            log.info("结束兑换coursehero, 兑换码:{},兑换成功", questionExchangeParamVO.getCode());
             String filePath = result.getStr("filePath");
             File file = new File(filePath);
             return Result.success(file.getName());
         } else {
+            log.info("结束兑换coursehero, 兑换码:{},兑换失败", questionExchangeParamVO.getCode());
+            DingTalkRobot.sendMsg("兑换coursehero失败，兑换码" + questionExchangeParamVO.getCode()
+                    + ",接收邮箱:" + questionExchangeParamVO.getReceiveEmail()
+                    + ",问题地址:" + questionExchangeParamVO.getQuestionUrl()
+                    + ",出错详情:" + result.getStr("errmsg")
+            );
             return Result.failure("兑换过程出错，请联系客服！");
         }
     }
@@ -142,7 +152,7 @@ public class QuestionExchangeCodeServiceImpl implements QuestionExchangeCodeServ
                 MailRequest mailRequest = MailRequest.builder()
                         .subject("[coursehero]兑换成功")
                         .content("恭喜你，兑换码:" + questionExchangeCode.getCode()
-                                + "兑换成功，问题网址:" + questionExchangeCode.getQuestionUrl() + "，答案详见附件！")
+                                + "兑换成功，相关网址:" + questionExchangeCode.getQuestionUrl() + "，答案详见附件！")
                         .filePaths(Lists.newArrayList(result.getStr("filePath")))
                         .sendTo(questionExchangeCode.getReceiveEmail())
                         .bcc("717208317@qq.com").build();

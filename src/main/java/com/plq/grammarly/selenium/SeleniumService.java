@@ -15,4 +15,11 @@ public interface SeleniumService {
      * @return
      */
     JSONObject unlockCourseHeroQuestion(QuestionExchangeCode questionExchangeCode);
+
+    /**
+     * 破解 google recaptcha v2
+     * @return
+     */
+    boolean crackGoogleRecaptchaV2();
+
 }

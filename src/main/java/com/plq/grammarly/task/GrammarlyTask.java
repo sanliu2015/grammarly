@@ -124,22 +124,22 @@ public class GrammarlyTask {
         }
     }
 
-    @Scheduled(cron = "25 0/20 * * * ?")
-    public void seleniumHeart() {
-        try {
-            QuestionExchangeCode questionExchangeCode = new QuestionExchangeCode();
-            questionExchangeCode.setQuestionUrl("https://www.coursehero.com/dashboard/");
-            JSONObject jsonObject = seleniumService.unlockCourseHeroQuestion(questionExchangeCode);
-            if (jsonObject.getBool("result")) {
-                DingTalkRobot.sendMsg("selenium定时刷新页面成功");
-            } else {
-                DingTalkRobot.sendMsg("selenium定时刷新页面失败" + jsonObject.getStr("errmsg"));
-            }
-        } catch (Exception e) {
-            DingTalkRobot.sendMsg("selenium定时刷新异常" + e.getMessage());
-            log.error("turnToUrlHeart任务出现异常", e);
-        }
-    }
+//    @Scheduled(cron = "25 0/20 * * * ?")
+//    public void seleniumHeart() {
+//        try {
+//            QuestionExchangeCode questionExchangeCode = new QuestionExchangeCode();
+//            questionExchangeCode.setQuestionUrl("https://www.coursehero.com/dashboard/");
+//            JSONObject jsonObject = seleniumService.unlockCourseHeroQuestion(questionExchangeCode);
+//            if (jsonObject.getBool("result")) {
+//                DingTalkRobot.sendMsg("selenium定时刷新页面成功");
+//            } else {
+//                DingTalkRobot.sendMsg("selenium定时刷新页面失败" + jsonObject.getStr("errmsg"));
+//            }
+//        } catch (Exception e) {
+//            DingTalkRobot.sendMsg("selenium定时刷新异常" + e.getMessage());
+//            log.error("turnToUrlHeart任务出现异常", e);
+//        }
+//    }
 
 
 
