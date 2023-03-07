@@ -125,7 +125,9 @@
                 if (receiveEmail != "") {
                     whereObj.receiveEmail = receiveEmail;
                 }
-                whereObj.status = $("#status").val();
+                if ($("#status").val() != "") {
+                    whereObj.status = $("#status").val();
+                }
                 // 执行重载,重新从第 1 页开始
                 table.reload('test', {
                     page: {
