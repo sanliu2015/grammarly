@@ -1,20 +1,16 @@
 package com.plq.grammarly.selenium;
 
-import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.plq.grammarly.model.entity.QuestionExchangeCode;
 import com.plq.grammarly.util.DingTalkRobot;
-import com.plq.grammarly.util.RecapthaUtil;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -25,7 +21,6 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chromium.ChromiumDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +37,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,12 +46,49 @@ public class SeleniumServiceImpl implements SeleniumService {
 
     private static EdgeDriver driver;
 
-    @Value("${downloadDir}")
-    private String downloadDir;
     @Value("${fileSaveDir}")
     private String fileSaveDir;
     @Value("${apiKey}")
     private String apiKey;
+
+    private static final String FIND_RECAPTCHA_PARAM_SCRIPT = "function findRecaptchaClients() {\n" +
+            "  // eslint-disable-next-line camelcase\n" +
+            "  if (typeof (___grecaptcha_cfg) !== 'undefined') {\n" +
+            "    // eslint-disable-next-line camelcase, no-undef\n" +
+            "    return Object.entries(___grecaptcha_cfg.clients).map(([cid, client]) => {\n" +
+            "      const data = { id: cid, version: cid >= 10000 ? 'V3' : 'V2' };\n" +
+            "      const objects = Object.entries(client).filter(([_, value]) => value && typeof value === 'object');\n" +
+            "\n" +
+            "      objects.forEach(([toplevelKey, toplevel]) => {\n" +
+            "        const found = Object.entries(toplevel).find(([_, value]) => (\n" +
+            "          value && typeof value === 'object' && 'sitekey' in value && 'size' in value\n" +
+            "        ));\n" +
+            "     \n" +
+            "        if (typeof toplevel === 'object' && toplevel instanceof HTMLElement && toplevel['tagName'] === 'DIV'){\n" +
+            "            data.pageurl = toplevel.baseURI;\n" +
+            "        }\n" +
+            "        \n" +
+            "        if (found) {\n" +
+            "          const [sublevelKey, sublevel] = found;\n" +
+            "\n" +
+            "          data.sitekey = sublevel.sitekey;\n" +
+            "          const callbackKey = data.version === 'V2' ? 'callback' : 'promise-callback';\n" +
+            "          const callback = sublevel[callbackKey];\n" +
+            "          if (!callback) {\n" +
+            "            data.callback = null;\n" +
+            "            data.function = null;\n" +
+            "          } else {\n" +
+            "            data.function = callback;\n" +
+            "            const keys = [cid, toplevelKey, sublevelKey, callbackKey].map((key) => `['${key}']`).join('');\n" +
+            "            data.callback = `___grecaptcha_cfg.clients${keys}`;\n" +
+            "          }\n" +
+            "        }\n" +
+            "      });\n" +
+            "      return data;\n" +
+            "    });\n" +
+            "  }\n" +
+            "  return [];\n" +
+            "}";
 
     /**
      * 命令行cmd先启动这个,前提edge加入环境变量C:\Program Files (x86)\Microsoft\Edge\Application
@@ -68,23 +99,23 @@ public class SeleniumServiceImpl implements SeleniumService {
     public void initEdgeSession() {
         try {
             WebDriverManager webDriverManager = WebDriverManager.edgedriver();
-//            if ("dev".equals(SpringUtil.getActiveProfile())) {
-//                webDriverManager.proxy("127.0.0.1:10809");
-//            }
             webDriverManager.setup();
             EdgeOptions options = new EdgeOptions();
             options.setExperimentalOption("debuggerAddress", "127.0.0.1:9333");
+            options.setExperimentalOption("download.prompt_for_download", false);
+            options.setExperimentalOption("download.default_directory", fileSaveDir);
             options.setPageLoadStrategy(PageLoadStrategy.NORMAL);
             options.setImplicitWaitTimeout(Duration.ofSeconds(10L));
             driver = new EdgeDriver(options);
             if (!"dev".equals(SpringUtil.getActiveProfile())) {
 //                driver.get("edge://version/");
-                driver.get("https://bot.sannysoft.com/");
-//                driver.get("https://www.coursehero.com/");
+//                driver.get("https://bot.sannysoft.com/");
+                driver.get("https://www.coursehero.com/");
             }
             log.info("初始化edge selenium驱动成功");
         } catch (Exception e) {
             log.error("初始化edge selenium驱动失败", e);
+            System.exit(500);
         }
     }
 
@@ -105,13 +136,13 @@ public class SeleniumServiceImpl implements SeleniumService {
             driver.get(questionExchangeCode.getQuestionUrl());
             ThreadUtil.safeSleep(1000L);
             if (driver.getPageSource().contains("Incapsula")) {
-                boolean passFlag = this.crackGoogleRecaptchaV2(driver.getCurrentUrl());
+                boolean passFlag = this.crackEnterpriseRecaptcha();
                 if (passFlag) {
                     // 人机验证成功的话睡眠5秒钟再操作
                     ThreadUtil.safeSleep(5000L);
                 } else {
                     return new JSONObject().putOpt("result", false)
-                            .putOpt("errorcode", "").putOpt("errmsg", "需要人机身份验证，请前往服务器进行操作！");
+                            .putOpt("errorcode", "").putOpt("errmsg", "破解人机校验失败，请手工前往服务器进行操作！");
                 }
             }
             if (questionExchangeCode.getCode() == null) {
@@ -123,7 +154,7 @@ public class SeleniumServiceImpl implements SeleniumService {
                 webElement.click();
                 // 留10秒文件下载
                 ThreadUtil.safeSleep(10000L);
-                String downloadFile = getNewestFile(downloadDir);
+                String downloadFile = getNewestFile(fileSaveDir);
                 String destFilePath = fileSaveDir + questionExchangeCode.getCode() + "." + FileUtil.getSuffix(downloadFile);
                 File srcFile = new File(downloadFile);
                 File dstFile = new File(destFilePath);
@@ -289,40 +320,45 @@ public class SeleniumServiceImpl implements SeleniumService {
 
     /**
      * 参考 https://2captcha.com/2captcha-api#solving_recaptchav2_new
-     * @param url
+     * https://2captcha.com/p/recaptcha_enterprise
+     *
      * @return
      */
     @Override
-    public boolean crackGoogleRecaptchaV2(String url) {
-        String token = null;
-        try {
-            // 包含g-recaptcha 显示的进行人机身份验证
-            String siteKey = driver.findElement(By.xpath("//*[@id=\"g-recaptcha\"]")).getAttribute("outerHTML");
-            siteKey = siteKey.split("&k=")[1].split("&")[0];
-            JSONObject obj1 = new JSONObject().putOpt("key", apiKey).putOpt("method", "userrecaptcha")
-                    .putOpt("googlekey", siteKey).putOpt("pageurl", url);
-            String body1 = HttpUtil.createPost("http://2captcha.com/in.php").body(JSONUtil.toJsonStr(obj1))
-                    .execute().body();
-            if (body1.startsWith("OK")) {
-                String request_id = body1.split("|")[1];
-                // 15-20秒后再发起另外1个请求
-                ThreadUtil.safeSleep(20000L);
-                HttpRequest resRequest = HttpUtil.createGet("http://2captcha.com/res.php?key=" + apiKey + "&action=get&id=" + request_id);
-                token = getTokenFromRequest(resRequest);
-                if ("false".equals(token)) {
-                    return false;
-                }
+    public boolean crackEnterpriseRecaptcha() {
+        driver.executeScript(FIND_RECAPTCHA_PARAM_SCRIPT);
+        Object result = driver.executeScript("return findRecaptchaClients()");
+        System.out.println(result);
 
-            } else {
-                log.error("2captcha.com/in.php请求失败，响应正文:{}", body1);
-                DingTalkRobot.sendMsg("2captcha.com/in.php请求失败，响应正文:" + body1);
-            }
-
-        } catch (NoSuchElementException e) {
-
-        }
-        driver.executeScript("var element = document.getElementById(\"g-recaptcha-response\"); element.style.display=\"\"");
-        driver.executeScript("document.getElementById(\"g-recaptcha-response\").innerHTML=\"" + token +  "\"");
+//        String token = null;
+//        try {
+//            // 包含g-recaptcha 显示的进行人机身份验证
+//            String siteKey = driver.findElement(By.xpath("//*[@id=\"g-recaptcha\"]")).getAttribute("outerHTML");
+//            siteKey = siteKey.split("&k=")[1].split("&")[0];
+//            JSONObject obj1 = new JSONObject().putOpt("key", apiKey).putOpt("method", "userrecaptcha")
+//                    .putOpt("googlekey", siteKey).putOpt("pageurl", url);
+//            String body1 = HttpUtil.createPost("http://2captcha.com/in.php").body(JSONUtil.toJsonStr(obj1))
+//                    .execute().body();
+//            if (body1.startsWith("OK")) {
+//                String request_id = body1.split("|")[1];
+//                // 15-20秒后再发起另外1个请求
+//                ThreadUtil.safeSleep(20000L);
+//                HttpRequest resRequest = HttpUtil.createGet("http://2captcha.com/res.php?key=" + apiKey + "&action=get&id=" + request_id);
+//                token = getTokenFromRequest(resRequest);
+//                if ("false".equals(token)) {
+//                    return false;
+//                }
+//
+//            } else {
+//                log.error("2captcha.com/in.php请求失败，响应正文:{}", body1);
+//                DingTalkRobot.sendMsg("2captcha.com/in.php请求失败，响应正文:" + body1);
+//            }
+//
+//        } catch (NoSuchElementException e) {
+//
+//        }
+//        driver.executeScript("var element = document.getElementById(\"g-recaptcha-response\"); element.style.display=\"\"");
+//        driver.executeScript("document.getElementById(\"g-recaptcha-response\").innerHTML=\"" + token +  "\"");
         return false;
     }
 
