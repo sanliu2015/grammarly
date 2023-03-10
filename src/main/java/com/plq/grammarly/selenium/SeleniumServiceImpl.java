@@ -2,6 +2,7 @@ package com.plq.grammarly.selenium;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
@@ -9,9 +10,12 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.plq.grammarly.model.entity.QuestionExchangeCode;
 import com.plq.grammarly.util.DingTalkRobot;
+import com.twocaptcha.TwoCaptcha;
+import com.twocaptcha.captcha.ReCaptcha;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
+import org.checkerframework.checker.units.qual.C;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
@@ -25,6 +29,7 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -36,6 +41,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +51,8 @@ import java.util.Map;
 public class SeleniumServiceImpl implements SeleniumService {
 
     private static EdgeDriver driver;
-
+    @Value("${downloadDir}")
+    private String downloadDir;
     @Value("${fileSaveDir}")
     private String fileSaveDir;
     @Value("${apiKey}")
@@ -88,7 +95,7 @@ public class SeleniumServiceImpl implements SeleniumService {
             "    });\n" +
             "  }\n" +
             "  return [];\n" +
-            "}";
+            "};let res=findRecaptchaClients();return res";
 
     /**
      * 命令行cmd先启动这个,前提edge加入环境变量C:\Program Files (x86)\Microsoft\Edge\Application
@@ -101,21 +108,26 @@ public class SeleniumServiceImpl implements SeleniumService {
             WebDriverManager webDriverManager = WebDriverManager.edgedriver();
             webDriverManager.setup();
             EdgeOptions options = new EdgeOptions();
+//            // 没什么卵用
+//            Map<String, Object> prefs = new HashMap<>();
+//            prefs.put("debuggerAddress", "127.0.0.1:9333");
+//            prefs.put("download.prompt_for_download", false);
+//            prefs.put("download.default_directory", fileSaveDir);
+//            options.setExperimentalOption("prefs", prefs);
             options.setExperimentalOption("debuggerAddress", "127.0.0.1:9333");
-            options.setExperimentalOption("download.prompt_for_download", false);
-            options.setExperimentalOption("download.default_directory", fileSaveDir);
             options.setPageLoadStrategy(PageLoadStrategy.NORMAL);
             options.setImplicitWaitTimeout(Duration.ofSeconds(10L));
             driver = new EdgeDriver(options);
-            if (!"dev".equals(SpringUtil.getActiveProfile())) {
-//                driver.get("edge://version/");
-//                driver.get("https://bot.sannysoft.com/");
-                driver.get("https://www.coursehero.com/");
-            }
+//            if ("dev".equals(SpringUtil.getActiveProfile())) {
+////                driver.get("edge://version/");
+////                driver.get("https://bot.sannysoft.com/");
+//                driver.get("https://www.coursehero.com/");
+//            }
+            driver.get("https://www.coursehero.com/dashboard/");
             log.info("初始化edge selenium驱动成功");
         } catch (Exception e) {
             log.error("初始化edge selenium驱动失败", e);
-            System.exit(500);
+            System.exit(0);
         }
     }
 
@@ -134,9 +146,18 @@ public class SeleniumServiceImpl implements SeleniumService {
     public synchronized JSONObject unlockCourseHeroQuestion(QuestionExchangeCode questionExchangeCode) {
         try {
             driver.get(questionExchangeCode.getQuestionUrl());
-            ThreadUtil.safeSleep(1000L);
-            if (driver.getPageSource().contains("Incapsula")) {
-                boolean passFlag = this.crackEnterpriseRecaptcha();
+            ThreadUtil.safeSleep(5000L);
+            String recaptchaType = "";
+            try {
+                WebElement webElement = driver.findElement(By.cssSelector("#g-recaptcha-response"));
+                recaptchaType = "1";
+            } catch (NoSuchElementException noSuchElementException) {
+                if (driver.getPageSource().contains("Incapsula")) {
+                    recaptchaType = "2";
+                }
+            }
+            if (!StrUtil.isEmpty(recaptchaType)) {
+                boolean passFlag = this.crackEnterpriseRecaptcha(recaptchaType);
                 if (passFlag) {
                     // 人机验证成功的话睡眠5秒钟再操作
                     ThreadUtil.safeSleep(5000L);
@@ -146,25 +167,42 @@ public class SeleniumServiceImpl implements SeleniumService {
                 }
             }
             if (questionExchangeCode.getCode() == null) {
+                // 心跳使用的
                 return new JSONObject().putOpt("result", true).putOpt("errmsg", "");
             }
-            // 先用文件解锁下载
+
+            // 如果是文件已经解锁
             try {
+                log.info("开始尝试【已解锁且为文件】策略进行下载，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
+                WebElement webElement = driver.findElement(By.cssSelector("#floating-ui-8"));
+                webElement.click();
+                ThreadUtil.safeSleep(1000L);
+                WebElement downloadButtonElement = driver.findElement(By.cssSelector("div[data-testid=\"TOOLBAR_DOWNLOAD_SSI_TEST_ID\"] a"));
+                downloadButtonElement.click();
+                // 留10秒文件下载
+                ThreadUtil.safeSleep(10000L);
+                log.info("成功尝试【已解锁且为文件】策略进行下载，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
+                return downloadAnswerFile(questionExchangeCode);
+            }  catch (NoSuchElementException noSuchElementException) {
+                log.info("结束尝试【已解锁且为文件】策略进行下载，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
+            }
+
+            // 如果是文件还未解锁
+            try {
+                log.info("开始尝试【未解锁且为文件】策略进行下载，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
                 WebElement webElement = driver.findElement(By.cssSelector("a[class=\"d-flex\"]"));
                 webElement.click();
                 // 留10秒文件下载
                 ThreadUtil.safeSleep(10000L);
-                String downloadFile = getNewestFile(fileSaveDir);
-                String destFilePath = fileSaveDir + questionExchangeCode.getCode() + "." + FileUtil.getSuffix(downloadFile);
-                File srcFile = new File(downloadFile);
-                File dstFile = new File(destFilePath);
-                FileUtil.move(srcFile, dstFile, false);
-                return new JSONObject().putOpt("result", true).putOpt("filePath", dstFile.getAbsolutePath());
+                log.info("成功尝试【已解锁且为文件】策略进行下载，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
+                return downloadAnswerFile(questionExchangeCode);
             } catch (NoSuchElementException noSuchElementException) {
-                log.info("a[class='d-flex'] 没找到文件解锁下载按钮");
+                log.info("结束尝试【已解锁且为文件】策略进行下载，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
             }
-            // 再用网页答案解解锁
+
+            // 如果是网页还未解锁
             try {
+                log.info("开始尝试【未解锁且为网页】策略进行解锁，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
                 driver.findElement(By.cssSelector("a[data-cha-target-name=\"unlock_answer_btn\"][data-cha-location=\"answer_content\"]")).click();
                 ThreadUtil.safeSleep(5000L);
                 // 关闭弹窗
@@ -174,9 +212,11 @@ public class SeleniumServiceImpl implements SeleniumService {
                 } catch (NoSuchElementException noSuchElementException) {
                     log.info("a[class=\"ch_popup_close\"] 没找到关闭弹窗按钮");
                 }
+                log.info("成功尝试【未解锁且为网页】策略解锁成功，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
             } catch (NoSuchElementException noSuchElementException) {
-                log.info("a[data-cha-target-name=\"unlock_answer_btn\"][data-cha-location=\"answer_content\"] 没找到页面答案解锁按钮");
+                log.info("结束尝试【未解锁且为网页】策略进行解锁，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
             }
+
             // 最后页面截图
             try {
                 WebElement webElement = driver.findElement(By.id("answer-content"));
@@ -188,9 +228,10 @@ public class SeleniumServiceImpl implements SeleniumService {
                 try (FileOutputStream fileOutputStream = new FileOutputStream(saveFile)) {
                     fileOutputStream.write(pngBase64String.getBytes(StandardCharsets.UTF_8));
                 }
+                log.info("最后尝试【页面截图】策略进行截图保存，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
                 return new JSONObject().putOpt("result", true).putOpt("filePath", saveFile.getAbsolutePath());
             } catch (NoSuchElementException noSuchElementException) {
-                log.info("answer-content 没找到页面答案");
+                log.info("最后尝试【页面截图】策略进行操作失败，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
             }
             FileUtil.writeUtf8String(driver.getPageSource(), fileSaveDir + questionExchangeCode.getCode() + ".html");
             return new JSONObject().putOpt("result", false).putOpt("errmsg", "没有找到期望操作的元素");
@@ -198,6 +239,15 @@ public class SeleniumServiceImpl implements SeleniumService {
             log.error("解锁courseHero发生异常，questionExchangeCode：{}", JSONUtil.toJsonStr(questionExchangeCode), e);
             return new JSONObject().putOpt("result", false).putOpt("errmsg", e.getMessage());
         }
+    }
+
+    private JSONObject downloadAnswerFile(QuestionExchangeCode questionExchangeCode) {
+        String downloadFile = getNewestFile(downloadDir);
+        String destFilePath = fileSaveDir + questionExchangeCode.getCode() + "." + FileUtil.getSuffix(downloadFile);
+        File srcFile = new File(downloadFile);
+        File dstFile = new File(destFilePath);
+        FileUtil.move(srcFile, dstFile, false);
+        return new JSONObject().putOpt("result", true).putOpt("filePath", dstFile.getAbsolutePath());
     }
 
     /**
@@ -325,42 +375,54 @@ public class SeleniumServiceImpl implements SeleniumService {
      * @return
      */
     @Override
-    public boolean crackEnterpriseRecaptcha() {
-        driver.executeScript(FIND_RECAPTCHA_PARAM_SCRIPT);
-        Object result = driver.executeScript("return findRecaptchaClients()");
-        System.out.println(result);
-
-//        String token = null;
-//        try {
-//            // 包含g-recaptcha 显示的进行人机身份验证
-//            String siteKey = driver.findElement(By.xpath("//*[@id=\"g-recaptcha\"]")).getAttribute("outerHTML");
-//            siteKey = siteKey.split("&k=")[1].split("&")[0];
-//            JSONObject obj1 = new JSONObject().putOpt("key", apiKey).putOpt("method", "userrecaptcha")
-//                    .putOpt("googlekey", siteKey).putOpt("pageurl", url);
-//            String body1 = HttpUtil.createPost("http://2captcha.com/in.php").body(JSONUtil.toJsonStr(obj1))
-//                    .execute().body();
-//            if (body1.startsWith("OK")) {
-//                String request_id = body1.split("|")[1];
-//                // 15-20秒后再发起另外1个请求
-//                ThreadUtil.safeSleep(20000L);
-//                HttpRequest resRequest = HttpUtil.createGet("http://2captcha.com/res.php?key=" + apiKey + "&action=get&id=" + request_id);
-//                token = getTokenFromRequest(resRequest);
-//                if ("false".equals(token)) {
-//                    return false;
-//                }
-//
-//            } else {
-//                log.error("2captcha.com/in.php请求失败，响应正文:{}", body1);
-//                DingTalkRobot.sendMsg("2captcha.com/in.php请求失败，响应正文:" + body1);
-//            }
-//
-//        } catch (NoSuchElementException e) {
-//
-//        }
-//        driver.executeScript("var element = document.getElementById(\"g-recaptcha-response\"); element.style.display=\"\"");
-//        driver.executeScript("document.getElementById(\"g-recaptcha-response\").innerHTML=\"" + token +  "\"");
-        return false;
+    public boolean crackEnterpriseRecaptcha(String recaptchaType) {
+        String pageurl = null;
+        String sitekey = null;
+        String version = null;
+        String callbackFunctionName = null;
+        ArrayList result = new ArrayList();
+        if ("2".equals(recaptchaType)) {
+            // 进入某个iframe,否则下面的执行脚本会报错
+            driver.switchTo().frame("main-iframe");
+        }
+        result = (ArrayList)driver.executeScript(FIND_RECAPTCHA_PARAM_SCRIPT);
+        if (result.size() == 1) {
+            Map<String, Object> res = (Map)result.get(0);
+            pageurl = (String)res.getOrDefault("pageurl", driver.getCurrentUrl());
+            sitekey = (String)res.get("sitekey");
+            version = (String)res.get("version");
+            if (res.get("function") instanceof String) {
+                callbackFunctionName = (String)res.get("function");
+            } else {
+                String jsCode = "return " + res.get("callback") + "['name']";
+                callbackFunctionName = (String)driver.executeScript(jsCode);
+            }
+        } else {
+            log.error("未知的capture类型：recaptchaType:{}, result:{}", recaptchaType, JSONUtil.toJsonStr(result));
+            return false;
+        }
+        TwoCaptcha solver = new TwoCaptcha(apiKey);
+        ReCaptcha captcha = new ReCaptcha();
+        captcha.setUrl(pageurl);
+        captcha.setSiteKey(sitekey);
+        captcha.setVersion(version);
+        try {
+            solver.solve(captcha);
+        } catch (Exception e) {
+            log.error("2captcha Error occurred: {}", e.getMessage(), e);
+            return false;
+        }
+        String responseCode = captcha.getCode();
+        log.info("2capcha return responsee code:{}", responseCode);
+        if ("1".equals(recaptchaType)) {
+            driver.executeScript("document.getElementById(\"g-recaptcha-response\").innerHTML=\"" + responseCode +  "\"");
+        } else if ("2".equals(recaptchaType)) {
+            String jsScriptCode = "window['" + callbackFunctionName + "']('" + responseCode + "')";
+            driver.executeScript(jsScriptCode);
+        }
+        return true;
     }
+
 
     private String getTokenFromRequest(HttpRequest resRequest) {
         String body = resRequest.execute().body();

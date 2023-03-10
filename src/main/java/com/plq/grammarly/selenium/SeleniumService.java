@@ -20,5 +20,5 @@ public interface SeleniumService {
      * 破解 google enterprise recaptcha
      * @return
      */
-    boolean crackEnterpriseRecaptcha();
+    boolean crackEnterpriseRecaptcha(String recaptchaType);
 }

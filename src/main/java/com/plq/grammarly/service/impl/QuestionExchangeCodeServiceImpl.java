@@ -114,7 +114,7 @@ public class QuestionExchangeCodeServiceImpl implements QuestionExchangeCodeServ
         }
         // 兑换过程出现异常
         if ("2".equals(questionExchangeCode.getStatus())) {
-            return Result.failure("此兑换码已经被兑换，请联系客服");
+            return Result.failure("此兑换码兑换异常，请您联系客服");
         }
         // 兑换码过期
         if ("3".equals(questionExchangeCode.getStatus())) {
