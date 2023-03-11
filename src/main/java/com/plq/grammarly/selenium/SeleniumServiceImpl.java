@@ -171,9 +171,18 @@ public class SeleniumServiceImpl implements SeleniumService {
                 return new JSONObject().putOpt("result", true).putOpt("errmsg", "");
             }
 
+            // 如果页面有遮罩的话
+            try {
+                log.debug("尝试检查是否有弹出遮罩，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
+                driver.findElement(By.cssSelector(".modal-dialog button[class*='modal-close']")).click();
+                log.debug("发现弹框遮罩并关闭成功，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
+            } catch (NoSuchElementException noSuchElementException) {
+                log.info("没有发现有弹出遮罩，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
+            }
+
             // 如果是文件已经解锁
             try {
-                log.info("开始尝试【已解锁且为文件】策略进行下载，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
+                log.debug("开始尝试【已解锁且为文件】策略进行下载，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
                 WebElement webElement = driver.findElement(By.cssSelector("#floating-ui-8"));
                 webElement.click();
                 ThreadUtil.safeSleep(1000L);
@@ -184,12 +193,12 @@ public class SeleniumServiceImpl implements SeleniumService {
                 log.info("成功尝试【已解锁且为文件】策略进行下载，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
                 return downloadAnswerFile(questionExchangeCode);
             }  catch (NoSuchElementException noSuchElementException) {
-                log.info("结束尝试【已解锁且为文件】策略进行下载，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
+                log.debug("结束尝试【已解锁且为文件】策略进行下载，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
             }
 
             // 如果是文件还未解锁
             try {
-                log.info("开始尝试【未解锁且为文件】策略进行下载，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
+                log.debug("开始尝试【未解锁且为文件】策略进行下载，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
                 WebElement webElement = driver.findElement(By.cssSelector("a[class=\"d-flex\"]"));
                 webElement.click();
                 // 留10秒文件下载
@@ -197,24 +206,25 @@ public class SeleniumServiceImpl implements SeleniumService {
                 log.info("成功尝试【已解锁且为文件】策略进行下载，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
                 return downloadAnswerFile(questionExchangeCode);
             } catch (NoSuchElementException noSuchElementException) {
-                log.info("结束尝试【已解锁且为文件】策略进行下载，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
+                log.debug("结束尝试【已解锁且为文件】策略进行下载，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
             }
 
             // 如果是网页还未解锁
             try {
-                log.info("开始尝试【未解锁且为网页】策略进行解锁，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
+                log.debug("开始尝试【未解锁且为网页】策略进行解锁，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
                 driver.findElement(By.cssSelector("a[data-cha-target-name=\"unlock_answer_btn\"][data-cha-location=\"answer_content\"]")).click();
                 ThreadUtil.safeSleep(5000L);
                 // 关闭弹窗
                 try {
                     driver.findElement(By.cssSelector("a[class=\"ch_popup_close\"]")).click();
+                    log.debug("发现弹框遮罩并关闭成功，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
                     ThreadUtil.safeSleep(1000L);
                 } catch (NoSuchElementException noSuchElementException) {
-                    log.info("a[class=\"ch_popup_close\"] 没找到关闭弹窗按钮");
+                    log.debug("a[class=\"ch_popup_close\"] 没找到关闭弹窗按钮");
                 }
                 log.info("成功尝试【未解锁且为网页】策略解锁成功，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
             } catch (NoSuchElementException noSuchElementException) {
-                log.info("结束尝试【未解锁且为网页】策略进行解锁，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
+                log.debug("结束尝试【未解锁且为网页】策略进行解锁，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
             }
 
             // 最后页面截图
