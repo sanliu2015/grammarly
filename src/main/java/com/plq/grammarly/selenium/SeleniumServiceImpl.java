@@ -178,11 +178,11 @@ public class SeleniumServiceImpl implements SeleniumService {
 
             // 如果页面有遮罩的话
             try {
-                log.debug("尝试检查是否有弹出遮罩，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
+                log.debug("检查是否有弹出遮罩，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
                 driver.findElement(By.cssSelector(".modal-dialog button[class*='modal-close']")).click();
                 log.debug("发现弹框遮罩并关闭成功，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
             } catch (NoSuchElementException noSuchElementException) {
-                log.info("没有发现有弹出遮罩，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
+                log.debug("没有发现有弹出遮罩，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
             }
 
             // 如果是文件已经解锁
@@ -279,7 +279,7 @@ public class SeleniumServiceImpl implements SeleniumService {
         driver.executeCdpCommand("Emulation.setDeviceMetricsOverride", map);
         // 然后再执行截图
         Map<String, Object> map2 = new HashMap<>();
-        map2.put("fromSurface", true);
+        map2.put("fromSurface", false);
         Map<String, Object> result = driver.executeCdpCommand("Page.captureScreenshot", map2);
         String imageBase64 = result.get("data").toString();
         // 关闭设备模拟
