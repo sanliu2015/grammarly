@@ -123,8 +123,13 @@ public class SeleniumServiceImpl implements SeleniumService {
 ////                driver.get("https://bot.sannysoft.com/");
 //                driver.get("https://www.coursehero.com/");
 //            }
-            driver.get("https://www.coursehero.com/dashboard/");
+//            driver.get("https://www.coursehero.com/dashboard/");
             log.info("初始化edge selenium驱动成功");
+            String pngBase64String = fullScreenCapture();
+            File saveFile = new File(fileSaveDir + "plq.png");
+            try (FileOutputStream fileOutputStream = new FileOutputStream(saveFile)) {
+                fileOutputStream.write(pngBase64String.getBytes(StandardCharsets.UTF_8));
+            }
         } catch (Exception e) {
             log.error("初始化edge selenium驱动失败", e);
             System.exit(0);
@@ -266,9 +271,8 @@ public class SeleniumServiceImpl implements SeleniumService {
      * @return
      */
     public static String fullScreenCapture() {
-        JavascriptExecutor driverJs= (JavascriptExecutor) driver;
-        Object width = driverJs.executeScript("document.body.scrollWidth");
-        Object height = driverJs.executeScript("document.body.scrollHeight");
+        Object width = driver.executeScript("return document.body.scrollWidth");
+        Object height = driver.executeScript("return document.body.scrollHeight");
         Map<String, Object> map = new HashMap<>();
         map.put("mobile", false);
         map.put("width", width);
@@ -279,7 +283,6 @@ public class SeleniumServiceImpl implements SeleniumService {
         Map<String, Object> map2 = new HashMap<>();
         map2.put("fromSurface", true);
         String imageBase64 = driver.executeCdpCommand("Page.captureScreenshot", map2).get("data").toString();
-        System.out.println(imageBase64.length());
         // 关闭设备模拟
         driver.executeCdpCommand("Emulation.clearDeviceMetricsOverride", new HashMap<>());
         // 返回的base64内容写入PNG文件

@@ -11,6 +11,7 @@ import com.plq.grammarly.model.entity.GrammarlyAccount;
 import com.plq.grammarly.model.vo.GenParamVO;
 import com.plq.grammarly.repository.ExchangeCodeRepository;
 import com.plq.grammarly.repository.GrammarlyAccountRepository;
+import com.plq.grammarly.selenium.SeleniumService;
 import com.plq.grammarly.service.ExchangeCodeService;
 import com.plq.grammarly.service.GrammarlyAccountService;
 import com.plq.grammarly.task.GrammarlyTask;
@@ -46,6 +47,13 @@ class GrammarlyApplicationTests {
 //	private GrammarlyTask grammarlyTask;
 	@Autowired
 	private SendMailService sendMailService;
+	@Autowired
+	private SeleniumService seleniumService;
+
+	@Test
+	void fullScreen() {
+		System.out.println("111");
+	}
 
 	@Test
 	void contextLoads() {
