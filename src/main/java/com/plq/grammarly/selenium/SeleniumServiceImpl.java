@@ -1,5 +1,6 @@
 package com.plq.grammarly.selenium;
 
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
@@ -13,6 +14,7 @@ import com.plq.grammarly.util.DingTalkRobot;
 import com.twocaptcha.TwoCaptcha;
 import com.twocaptcha.captcha.ReCaptcha;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
 import org.checkerframework.checker.units.qual.C;
@@ -43,6 +45,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -118,18 +121,15 @@ public class SeleniumServiceImpl implements SeleniumService {
             options.setPageLoadStrategy(PageLoadStrategy.NORMAL);
             options.setImplicitWaitTimeout(Duration.ofSeconds(10L));
             driver = new EdgeDriver(options);
+            if (driver.getCurrentUrl() == null || !driver.getCurrentUrl().contains("coursehero.com")) {
+                driver.get("https://www.coursehero.com/dashboard/");
+            }
 //            if ("dev".equals(SpringUtil.getActiveProfile())) {
 ////                driver.get("edge://version/");
 ////                driver.get("https://bot.sannysoft.com/");
 //                driver.get("https://www.coursehero.com/");
 //            }
-//            driver.get("https://www.coursehero.com/dashboard/");
             log.info("初始化edge selenium驱动成功");
-            String pngBase64String = fullScreenCapture();
-            File saveFile = new File(fileSaveDir + "plq.png");
-            try (FileOutputStream fileOutputStream = new FileOutputStream(saveFile)) {
-                fileOutputStream.write(pngBase64String.getBytes(StandardCharsets.UTF_8));
-            }
         } catch (Exception e) {
             log.error("初始化edge selenium驱动失败", e);
             System.exit(0);
@@ -240,9 +240,7 @@ public class SeleniumServiceImpl implements SeleniumService {
 //                FileUtil.copyFile(snapshot, saveFile);
                 String pngBase64String = fullScreenCapture();
                 File saveFile = new File(fileSaveDir + questionExchangeCode.getCode() + ".png");
-                try (FileOutputStream fileOutputStream = new FileOutputStream(saveFile)) {
-                    fileOutputStream.write(pngBase64String.getBytes(StandardCharsets.UTF_8));
-                }
+                Base64.decodeToFile(pngBase64String, saveFile);
                 log.info("最后尝试【页面截图】策略进行截图保存，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
                 return new JSONObject().putOpt("result", true).putOpt("filePath", saveFile.getAbsolutePath());
             } catch (NoSuchElementException noSuchElementException) {
@@ -282,7 +280,8 @@ public class SeleniumServiceImpl implements SeleniumService {
         // 然后再执行截图
         Map<String, Object> map2 = new HashMap<>();
         map2.put("fromSurface", true);
-        String imageBase64 = driver.executeCdpCommand("Page.captureScreenshot", map2).get("data").toString();
+        Map<String, Object> result = driver.executeCdpCommand("Page.captureScreenshot", map2);
+        String imageBase64 = result.get("data").toString();
         // 关闭设备模拟
         driver.executeCdpCommand("Emulation.clearDeviceMetricsOverride", new HashMap<>());
         // 返回的base64内容写入PNG文件
