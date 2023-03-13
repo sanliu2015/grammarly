@@ -111,7 +111,7 @@ public class SeleniumServiceImpl implements SeleniumService {
             WebDriverManager webDriverManager = WebDriverManager.edgedriver();
             webDriverManager.setup();
             EdgeOptions options = new EdgeOptions();
-//            // 没什么卵用
+//            // 没什么用
 //            Map<String, Object> prefs = new HashMap<>();
 //            prefs.put("debuggerAddress", "127.0.0.1:9333");
 //            prefs.put("download.prompt_for_download", false);
@@ -130,6 +130,9 @@ public class SeleniumServiceImpl implements SeleniumService {
 //                driver.get("https://www.coursehero.com/");
 //            }
             log.info("初始化edge selenium驱动成功");
+            String pngBase64String = fullScreenCapture();
+            File saveFile = new File(fileSaveDir + System.currentTimeMillis() + ".png");
+            Base64.decodeToFile(pngBase64String, saveFile);
         } catch (Exception e) {
             log.error("初始化edge selenium驱动失败", e);
             System.exit(0);
