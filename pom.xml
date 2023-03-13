@@ -21,7 +21,6 @@
 		<respond.version>1.4.2</respond.version>
 		<layer.version>3.1.1</layer.version>
 		<datetimepicker.version>4.17.47</datetimepicker.version>
-		<selenium.version>4.8.0</selenium.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -148,7 +147,7 @@
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
-			<version>${selenium.version}</version>
+			<version>4.8.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>

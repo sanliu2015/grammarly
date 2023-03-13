@@ -279,7 +279,7 @@ public class SeleniumServiceImpl implements SeleniumService {
         driver.executeCdpCommand("Emulation.setDeviceMetricsOverride", map);
         // 然后再执行截图
         Map<String, Object> map2 = new HashMap<>();
-        map2.put("fromSurface", false);
+        map2.put("fromSurface", true);
         Map<String, Object> result = driver.executeCdpCommand("Page.captureScreenshot", map2);
         String imageBase64 = result.get("data").toString();
         // 关闭设备模拟
