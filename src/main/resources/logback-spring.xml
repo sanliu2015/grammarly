@@ -168,7 +168,7 @@
     <springProfile name="default,dev,uat">
         <logger name="org.springframework.web" level="INFO"/>
         <logger name="sun.rmi.loader" level="WARN"/>
-        <logger name="com.plq" level="DEBUG"/>
+        <logger name="com.plq" level="DEBUG" additivity="false"/>
         <root level="INFO">
             <appender-ref ref="ASYNC_CONSOLE" />
             <appender-ref ref="ASYNC_DEBUG_FILE" />
@@ -182,7 +182,7 @@
         <logger name="sun.rmi.loader" level="WARN"/>
         <logger name="com.plq" level="INFO"/>
         <root level="INFO">
-            <appender-ref ref="ASYNC_CONSOLE" />
+<!--            <appender-ref ref="ASYNC_CONSOLE" />-->
             <appender-ref ref="ASYNC_INFO_FILE" />
             <appender-ref ref="ASYNC_ERROR_FILE" />
         </root>
