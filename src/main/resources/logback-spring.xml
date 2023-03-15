@@ -165,7 +165,7 @@
     <logger name="sun.rmi.loader" level="error"/>
 
     <!-- 开发、测试环境 -->
-    <springProfile name="default,dev,uat">
+    <springProfile name="dev,uat">
         <logger name="org.springframework.web" level="INFO"/>
         <logger name="sun.rmi.loader" level="WARN"/>
         <logger name="com.plq" level="DEBUG" additivity="false"/>
