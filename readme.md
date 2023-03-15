@@ -1,3 +1,6 @@
+## 生产打包 
+ > mvn clean package -P pro '-Dmaven.test.skip=true'
+
 ## 把edge浏览器加入系统环境变量Path中
  > edge浏览器一般在这个路径，C:\Program Files (x86)\Microsoft\Edge\Application
  ![img.png](img.png)
