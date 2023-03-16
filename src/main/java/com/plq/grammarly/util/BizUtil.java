@@ -44,7 +44,9 @@ public class BizUtil {
      * @return
      */
     public static HttpRequest buildInviteHttpRequest(Map<String, String> httpRequestHeadMap) {
-        HttpRequest httpRequest = HttpUtil.createPost("https://goldengate.grammarly.com/institution/api/institution/admin/users/add")
+        HttpRequest httpRequest = HttpUtil.createPost("https://goldengate.grammarly.com/institution/api/institution/admin/users/add");
+        removeHutoolOriginHeader(httpRequest);
+        httpRequest
                 .header("user-agent", httpRequestHeadMap.get("user-agent"))
                 .header("sec-fetch-site", httpRequestHeadMap.getOrDefault("sec-fetch-site", "same-site"))
                 .header("sec-fetch-mode", httpRequestHeadMap.getOrDefault("sec-fetch-site", "cors"))
@@ -70,8 +72,17 @@ public class BizUtil {
         return httpRequest;
     }
 
+    private static void removeHutoolOriginHeader(HttpRequest httpRequest) {
+        httpRequest.removeHeader("User-Agent");
+        httpRequest.removeHeader("Accept");
+        httpRequest.removeHeader("Accept-Encoding");
+        httpRequest.removeHeader("Accept-Language");
+    }
+
     public static HttpRequest buildRemoveHttpRequest(Map<String, String> httpRequestHeadMap) {
-        HttpRequest httpRequest = HttpUtil.createRequest(Method.DELETE, "https://goldengate.grammarly.com/institution/api/institution/members")
+        HttpRequest httpRequest = HttpUtil.createRequest(Method.DELETE, "https://goldengate.grammarly.com/institution/api/institution/members");
+        removeHutoolOriginHeader(httpRequest);
+        httpRequest
                 .header("user-agent", httpRequestHeadMap.get("user-agent"))
                 .header("sec-fetch-site", httpRequestHeadMap.getOrDefault("sec-fetch-site", "same-site"))
                 .header("sec-fetch-mode", httpRequestHeadMap.getOrDefault("sec-fetch-site", "cors"))
@@ -98,7 +109,9 @@ public class BizUtil {
     }
 
     public static HttpRequest buildQueryHttpRequest(Map<String, String> httpRequestHeadMap) {
-        HttpRequest httpRequest = HttpUtil.createGet("https://goldengate.grammarly.com/institution/api/institution/members?offset=0&limit=10&order=email&order_type=asc&search=_&memberStatus=ACTIVE&memberStatus=INVITED&memberStatus=INVITE_EXPIRED")
+        HttpRequest httpRequest = HttpUtil.createGet("https://goldengate.grammarly.com/institution/api/institution/members?offset=0&limit=10&order=email&order_type=asc&search=_&memberStatus=ACTIVE&memberStatus=INVITED&memberStatus=INVITE_EXPIRED");
+        removeHutoolOriginHeader(httpRequest);
+        httpRequest
                 .header("user-agent", httpRequestHeadMap.get("user-agent"))
                 .header("sec-fetch-site", httpRequestHeadMap.getOrDefault("sec-fetch-site", "same-site"))
                 .header("sec-fetch-mode", httpRequestHeadMap.getOrDefault("sec-fetch-site", "cors"))
