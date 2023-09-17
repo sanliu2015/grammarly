@@ -51,11 +51,6 @@ class GrammarlyApplicationTests {
 	private SeleniumService seleniumService;
 
 	@Test
-	void fullScreen() {
-		System.out.println("111");
-	}
-
-	@Test
 	void contextLoads() {
 		ExchangeCode exchangeCode = new ExchangeCode();
 		exchangeCode.setNumber(RandomUtil.randomString(16));

@@ -12,15 +12,16 @@ spring:
             password: 4qlPi9zeL1dqhtJ8
             auto-index-creation: true
 #            uri: "mongodb://root:4qlPi9zeL1dqhtJ8@121.4.232.40:27017/grammarly?ssl=false"
+    mail:
+        properties:
+            mail:
+                smtp:
+                    debug: true
 
 logging:
     level:
         org.springframework.data.mongodb.core: DEBUG
 
-#spring:
-#    data:
-#        mongodb:
-#            host: 172.16.21.6
-#            port: 27017
-#            database: grammarly
-#            auto-index-creation: true
+downloadDir: C:/Users/plq/Downloads/
+fileSaveDir: D:/selenium/download/
+apiKey: 0d2b65a9ab1302ee96b0d0683b12bfcd

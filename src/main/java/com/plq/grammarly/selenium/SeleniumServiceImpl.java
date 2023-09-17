@@ -1,11 +1,10 @@
 package com.plq.grammarly.selenium;
 
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.plq.grammarly.model.entity.QuestionExchangeCode;
@@ -15,9 +14,7 @@ import com.twocaptcha.captcha.ReCaptcha;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
-import org.checkerframework.checker.units.qual.C;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.PageLoadStrategy;
@@ -29,7 +26,6 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -37,9 +33,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -108,7 +102,7 @@ public class SeleniumServiceImpl implements SeleniumService {
             WebDriverManager webDriverManager = WebDriverManager.edgedriver();
             webDriverManager.setup();
             EdgeOptions options = new EdgeOptions();
-//            // 没什么卵用
+//            // 没什么用
 //            Map<String, Object> prefs = new HashMap<>();
 //            prefs.put("debuggerAddress", "127.0.0.1:9333");
 //            prefs.put("download.prompt_for_download", false);
@@ -118,18 +112,15 @@ public class SeleniumServiceImpl implements SeleniumService {
             options.setPageLoadStrategy(PageLoadStrategy.NORMAL);
             options.setImplicitWaitTimeout(Duration.ofSeconds(10L));
             driver = new EdgeDriver(options);
+            if (driver.getCurrentUrl() == null || !driver.getCurrentUrl().contains("coursehero.com")) {
+                driver.get("https://www.coursehero.com/dashboard/");
+            }
 //            if ("dev".equals(SpringUtil.getActiveProfile())) {
 ////                driver.get("edge://version/");
 ////                driver.get("https://bot.sannysoft.com/");
 //                driver.get("https://www.coursehero.com/");
 //            }
-//            driver.get("https://www.coursehero.com/dashboard/");
             log.info("初始化edge selenium驱动成功");
-            String pngBase64String = fullScreenCapture();
-            File saveFile = new File(fileSaveDir + "plq.png");
-            try (FileOutputStream fileOutputStream = new FileOutputStream(saveFile)) {
-                fileOutputStream.write(pngBase64String.getBytes(StandardCharsets.UTF_8));
-            }
         } catch (Exception e) {
             log.error("初始化edge selenium驱动失败", e);
             System.exit(0);
@@ -178,11 +169,11 @@ public class SeleniumServiceImpl implements SeleniumService {
 
             // 如果页面有遮罩的话
             try {
-                log.debug("尝试检查是否有弹出遮罩，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
+                log.debug("检查是否有弹出遮罩，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
                 driver.findElement(By.cssSelector(".modal-dialog button[class*='modal-close']")).click();
                 log.debug("发现弹框遮罩并关闭成功，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
             } catch (NoSuchElementException noSuchElementException) {
-                log.info("没有发现有弹出遮罩，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
+                log.debug("没有发现有弹出遮罩，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
             }
 
             // 如果是文件已经解锁
@@ -240,9 +231,7 @@ public class SeleniumServiceImpl implements SeleniumService {
 //                FileUtil.copyFile(snapshot, saveFile);
                 String pngBase64String = fullScreenCapture();
                 File saveFile = new File(fileSaveDir + questionExchangeCode.getCode() + ".png");
-                try (FileOutputStream fileOutputStream = new FileOutputStream(saveFile)) {
-                    fileOutputStream.write(pngBase64String.getBytes(StandardCharsets.UTF_8));
-                }
+                Base64.decodeToFile(pngBase64String, saveFile);
                 log.info("最后尝试【页面截图】策略进行截图保存，code:{},url:{}", questionExchangeCode.getCode(), questionExchangeCode.getQuestionUrl());
                 return new JSONObject().putOpt("result", true).putOpt("filePath", saveFile.getAbsolutePath());
             } catch (NoSuchElementException noSuchElementException) {
@@ -282,7 +271,8 @@ public class SeleniumServiceImpl implements SeleniumService {
         // 然后再执行截图
         Map<String, Object> map2 = new HashMap<>();
         map2.put("fromSurface", true);
-        String imageBase64 = driver.executeCdpCommand("Page.captureScreenshot", map2).get("data").toString();
+        Map<String, Object> result = driver.executeCdpCommand("Page.captureScreenshot", map2);
+        String imageBase64 = result.get("data").toString();
         // 关闭设备模拟
         driver.executeCdpCommand("Emulation.clearDeviceMetricsOverride", new HashMap<>());
         // 返回的base64内容写入PNG文件
