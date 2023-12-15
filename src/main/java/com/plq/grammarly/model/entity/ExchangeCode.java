@@ -52,6 +52,7 @@ public class ExchangeCode implements Serializable {
     /**
      * 生成日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @CreatedDate
     private Date createTime;
     /**
@@ -66,11 +67,13 @@ public class ExchangeCode implements Serializable {
     /**
      * 兑换日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date exchangeTime;
 
     /**
      * 会员到期日期=兑换日期exchange+有效天数validDays（只到天不到时分秒）
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date memberDeadline;
 
     /**
@@ -91,10 +94,12 @@ public class ExchangeCode implements Serializable {
     /**
      * 移除时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date removeTime;
 
     private String errorMsg;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @LastModifiedDate
     private Date updateTime;
 

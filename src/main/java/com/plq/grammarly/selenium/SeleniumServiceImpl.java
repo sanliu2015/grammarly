@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -92,6 +93,8 @@ public class SeleniumServiceImpl implements SeleniumService {
             "};let res=findRecaptchaClients();return res";
 
     /**
+     * 好像高版本这种--remote-debugging-port 会报错，启动不了，注释掉options.setExperimentalOption("debuggerAddress", "127.0.0.1:9333");
+     * 采用系统接管浏览器，其实现在没有用到此功能
      * 命令行cmd先启动这个,前提edge加入环境变量C:\Program Files (x86)\Microsoft\Edge\Application
      * msedge.exe --remote-debugging-port=9333 --user-data-dir="D:\selenium\msedge_data"
      */
@@ -101,8 +104,12 @@ public class SeleniumServiceImpl implements SeleniumService {
         try {
             WebDriverManager.edgedriver().setup();
             EdgeOptions options = new EdgeOptions();
-            options.setExperimentalOption("debuggerAddress", "127.0.0.1:9333");
+//            options.setExperimentalOption("debuggerAddress", "127.0.0.1:9333");
             options.addArguments("--remote-allow-origins=*");
+            // 屏蔽浏览器提示“受到自动化软件控制”
+            options.addArguments("--disable-blink-features=AutomationControlled");
+            options.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
+            options.setExperimentalOption("useAutomationExtension", false);
             options.setPageLoadStrategy(PageLoadStrategy.NORMAL);
             options.setImplicitWaitTimeout(Duration.ofSeconds(10L));
             driver = new EdgeDriver(options);
