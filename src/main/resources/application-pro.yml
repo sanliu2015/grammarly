@@ -6,7 +6,3 @@ spring:
         mongodb:
             database: grammarly
             auto-index-creation: true
-
-downloadDir: C:/Users/Administrator/Downloads
-fileSaveDir: D:/selenium/downloads/
-apiKey: 0d2b65a9ab1302ee96b0d0683b12bfcd

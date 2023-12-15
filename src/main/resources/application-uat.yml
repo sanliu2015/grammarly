@@ -21,7 +21,3 @@ spring:
 logging:
     level:
         org.springframework.data.mongodb.core: DEBUG
-
-downloadDir: C:/Users/plq/Downloads/
-fileSaveDir: D:/selenium/download/
-apiKey: 0d2b65a9ab1302ee96b0d0683b12bfcd

@@ -14,7 +14,7 @@
 	<name>grammarly</name>
 	<description>grammarly business api</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>1.8</java.version>
 		<bootstrap.version>3.3.7</bootstrap.version>
 		<jquery.version>1.12.4</jquery.version>
 		<html5shiv.version>3.7.3</html5shiv.version>
@@ -99,11 +99,7 @@
 			<artifactId>hutool-all</artifactId>
 			<version>5.6.6</version>
 		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>30.1.1-jre</version>
-		</dependency>
+
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>bootstrap</artifactId>
@@ -135,19 +131,9 @@
 			<version>${datetimepicker.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>io.github.bonigarcia</groupId>
-			<artifactId>webdrivermanager</artifactId>
-			<version>5.6.2</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.httpcomponents.client5</groupId>
 			<artifactId>httpclient5</artifactId>
 			<version>5.2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-java</artifactId>
-			<version>4.16.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -169,36 +155,6 @@
 			<groupId>org.webjars.npm</groupId>
 			<artifactId>js-base64</artifactId>
 			<version>3.7.5</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.github.2captcha</groupId>
-			<artifactId>2captcha-java</artifactId>
-			<version>1.0.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-core</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.activation</groupId>
-			<artifactId>activation</artifactId>
-			<version>1.1.1</version>
 		</dependency>
 
 	</dependencies>

@@ -8,12 +8,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurationSupport {
 
-    @Value("${fileSaveDir}")
-    private String fileSaveDir;
-
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
-        registry.addResourceHandler("/file/download/**").addResourceLocations("file:" + fileSaveDir);
     }
 }

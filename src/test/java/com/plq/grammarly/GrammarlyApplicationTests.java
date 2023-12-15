@@ -3,28 +3,20 @@ package com.plq.grammarly;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
-import com.google.common.collect.Lists;
-import com.plq.grammarly.email.MailRequest;
-import com.plq.grammarly.email.SendMailService;
 import com.plq.grammarly.model.entity.ExchangeCode;
 import com.plq.grammarly.model.entity.GrammarlyAccount;
 import com.plq.grammarly.model.vo.GenParamVO;
 import com.plq.grammarly.repository.ExchangeCodeRepository;
 import com.plq.grammarly.repository.GrammarlyAccountRepository;
-import com.plq.grammarly.selenium.SeleniumService;
 import com.plq.grammarly.service.ExchangeCodeService;
 import com.plq.grammarly.service.GrammarlyAccountService;
-import com.plq.grammarly.task.GrammarlyTask;
 import com.plq.grammarly.util.BizUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.annotation.Scheduled;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -45,10 +37,6 @@ class GrammarlyApplicationTests {
 	private GrammarlyAccountRepository grammarlyAccountRepository;
 //	@Autowired
 //	private GrammarlyTask grammarlyTask;
-	@Autowired
-	private SendMailService sendMailService;
-	@Autowired
-	private SeleniumService seleniumService;
 
 	@Test
 	void contextLoads() {
@@ -167,16 +155,5 @@ class GrammarlyApplicationTests {
 		}
 	}
 
-	@Test
-	void testSendHtmlMail() {
-		MailRequest mailRequest = MailRequest.builder()
-				.subject("主题1")
-				.content("哈哈")
-				.sendTo("717208317@qq.com")
-				.bcc("luquan.peng@genesisfin.net")
-				.filePaths(Lists.newArrayList("C:\\Users\\plq\\Downloads\\修复TA基金净值_20220922.sql"))
-				.build();
-		sendMailService.sendHtmlMail(mailRequest);
-	}
 
 }

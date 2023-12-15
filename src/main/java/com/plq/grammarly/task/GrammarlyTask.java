@@ -1,31 +1,25 @@
 package com.plq.grammarly.task;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
-import cn.hutool.json.JSONObject;
 import com.plq.grammarly.model.entity.ExchangeCode;
 import com.plq.grammarly.model.entity.GrammarlyAccount;
-import com.plq.grammarly.model.entity.QuestionExchangeCode;
-import com.plq.grammarly.selenium.SeleniumService;
 import com.plq.grammarly.service.ExchangeCodeService;
 import com.plq.grammarly.service.GrammarlyAccountService;
-import com.plq.grammarly.service.QuestionExchangeCodeService;
 import com.plq.grammarly.util.BizUtil;
-import com.plq.grammarly.util.DingTalkRobot;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This is Description
@@ -40,15 +34,10 @@ public class GrammarlyTask {
 
     private final GrammarlyAccountService grammarlyAccountService;
     private final ExchangeCodeService exchangeCodeService;
-    private final QuestionExchangeCodeService questionExchangeCodeService;
 
-    private final SeleniumService seleniumService;
-
-    public GrammarlyTask(GrammarlyAccountService grammarlyAccountService, ExchangeCodeService exchangeCodeService, QuestionExchangeCodeService questionExchangeCodeService, SeleniumService seleniumService) {
+    public GrammarlyTask(GrammarlyAccountService grammarlyAccountService, ExchangeCodeService exchangeCodeService) {
         this.grammarlyAccountService = grammarlyAccountService;
         this.exchangeCodeService = exchangeCodeService;
-        this.questionExchangeCodeService = questionExchangeCodeService;
-        this.seleniumService = seleniumService;
     }
 
     /**
@@ -113,36 +102,6 @@ public class GrammarlyTask {
         }
     }
 
-
-    @Scheduled(cron = "5 0 0 * * ?")
-    public void questionExhangeCodeExpire() {
-        try {
-            String day = DateUtil.format(new Date(), "yyyy-MM-dd");
-            questionExchangeCodeService.batchUpdateExpire(day);
-        } catch (Exception e) {
-            log.error("更新解锁兑换码过期状态任务出现异常");
-        }
-    }
-
-//    @Scheduled(cron = "25 0/20 * * * ?")
-//    public void seleniumHeart() {
-//        try {
-//            QuestionExchangeCode questionExchangeCode = new QuestionExchangeCode();
-//            questionExchangeCode.setQuestionUrl("https://www.coursehero.com/dashboard/");
-//            JSONObject jsonObject = seleniumService.unlockCourseHeroQuestion(questionExchangeCode);
-//            if (jsonObject.getBool("result")) {
-//                DingTalkRobot.sendMsg("selenium定时刷新页面成功");
-//            } else {
-//                DingTalkRobot.sendMsg("selenium定时刷新页面失败" + jsonObject.getStr("errmsg"));
-//            }
-//        } catch (Exception e) {
-//            DingTalkRobot.sendMsg("selenium定时刷新异常" + e.getMessage());
-//            log.error("turnToUrlHeart任务出现异常", e);
-//        }
-//    }
-
-
-
     /**
      * 启动把所有未兑换且逾期的兑换过期状态职位true
      */
@@ -161,13 +120,7 @@ public class GrammarlyTask {
                 exchangeCodeService.updateObj(exchangeCode);
             }
         }
-        List<QuestionExchangeCode> questionExchangeCodes = questionExchangeCodeService.findByDeadlineLessThanAndStatus(day, "0");
-        if (questionExchangeCodes != null) {
-            for (QuestionExchangeCode questionExchangeCode : questionExchangeCodes) {
-                questionExchangeCode.setStatus("3");
-                questionExchangeCodeService.updateObj(questionExchangeCode);
-            }
-        }
+
     }
 
 }
