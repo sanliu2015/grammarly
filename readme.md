@@ -1,12 +1,2 @@
-## 生产打包 
+## 生产打包 jdk1.8
  > mvn clean package -P pro '-Dmaven.test.skip=true'
-
-## 把edge浏览器加入系统环境变量Path中
- > edge浏览器一般在这个路径，C:\Program Files (x86)\Microsoft\Edge\Application
- ![img.png](img.png)
-
-## win + R 打开 运行窗口， 执行下面命令启动edge浏览器，好像 120版本之后这种远程调试端口会报错，不用运行这个命令了
-  > msedge.exe --remote-debugging-port=9333 --user-data-dir="D:\selenium\msedge_data"
-  > ![img_1.png](img_1.png)
-
-## 再运行GrammarlyApplication启动
