@@ -20,7 +20,7 @@
     <script src="${ctx.contextPath}/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="${ctx.contextPath}/webjars/layer/dist/layer.js"></script>
     <script src="${ctx.contextPath}/webjars/js-cookie/2.2.1/js.cookie.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/js-base64@3.7.2/base64.min.js"></script>
+    <script src="${ctx.contextPath}/webjars/js-base64/3.7.5/base64.js"></script>
 </head>
 <body>
 <div class="container">
