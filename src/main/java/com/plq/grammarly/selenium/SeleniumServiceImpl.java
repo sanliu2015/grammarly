@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.google.common.collect.Lists;
 import com.plq.grammarly.model.entity.QuestionExchangeCode;
 import com.plq.grammarly.util.DingTalkRobot;
 import com.twocaptcha.TwoCaptcha;
@@ -101,42 +102,43 @@ public class SeleniumServiceImpl implements SeleniumService {
     @PostConstruct
     @Override
     public void initEdgeSession() {
-        try {
-            WebDriverManager.edgedriver().setup();
-            EdgeOptions options = new EdgeOptions();
-//            options.setExperimentalOption("debuggerAddress", "127.0.0.1:9333");
-            options.addArguments("--remote-allow-origins=*");
-            // 屏蔽浏览器提示“受到自动化软件控制”
-            options.addArguments("--disable-blink-features=AutomationControlled");
-            options.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
-            options.setExperimentalOption("useAutomationExtension", false);
-            options.setPageLoadStrategy(PageLoadStrategy.NORMAL);
-            options.setImplicitWaitTimeout(Duration.ofSeconds(10L));
-            driver = new EdgeDriver(options);
-            if (driver.getCurrentUrl() == null || !driver.getCurrentUrl().contains("coursehero.com")) {
-                driver.get("https://www.coursehero.com/dashboard/");
-            }
-//            if ("dev".equals(SpringUtil.getActiveProfile())) {
-////                driver.get("edge://version/");
-////                driver.get("https://bot.sannysoft.com/");
-//                driver.get("https://www.coursehero.com/");
+//        try {
+//            WebDriverManager.edgedriver().setup();
+//            EdgeOptions options = new EdgeOptions();
+//            options.addArguments("--remote-allow-origins=*");
+////            options.setExperimentalOption("debuggerAddress", "127.0.0.1:9333");
+//            // 屏蔽浏览器提示“受到自动化软件控制”
+//            options.addArguments("--disable-blink-features=AutomationControlled");
+//            options.setExperimentalOption("excludeSwitches", Lists.newArrayList("enable-automation"));
+//            options.setExperimentalOption("useAutomationExtension", false);
+//            options.setPageLoadStrategy(PageLoadStrategy.NORMAL);
+//            options.setImplicitWaitTimeout(Duration.ofSeconds(10L));
+//            driver = new EdgeDriver(options);
+//            if (driver.getCurrentUrl() == null || !driver.getCurrentUrl().contains("coursehero.com")) {
+////                driver.get("https://www.coursehero.com/dashboard/");
+//                driver.get("edge://version/");
 //            }
-            log.info("初始化edge selenium驱动成功");
-        } catch (Exception e) {
-            log.error("初始化edge selenium驱动失败", e);
-            System.exit(0);
-        }
+////            if ("dev".equals(SpringUtil.getActiveProfile())) {
+//////                driver.get("edge://version/");
+//////                driver.get("https://bot.sannysoft.com/");
+////                driver.get("https://www.coursehero.com/");
+////            }
+//            log.info("初始化edge selenium驱动成功");
+//        } catch (Exception e) {
+//            log.error("初始化edge selenium驱动失败", e);
+//            System.exit(0);
+//        }
     }
 
     @PreDestroy
     @Override
     public void destoryEdgeSession() {
-        try {
-            driver.quit();
-            log.info("销毁edge selenium驱动成功");
-        } catch (Exception e) {
-            log.error("销毁edge selenium驱动失败", e);
-        }
+//        try {
+//            driver.quit();
+//            log.info("销毁edge selenium驱动成功");
+//        } catch (Exception e) {
+//            log.error("销毁edge selenium驱动失败", e);
+//        }
     }
 
     @Override
