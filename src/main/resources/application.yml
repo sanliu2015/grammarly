@@ -26,19 +26,5 @@ spring:
     content-type: text/html
     enabled: true
     suffix: .ftl
-    template-loader-path: classpath:/templates #配置模板所在目录
-  mail:
-    default-encoding: UTF-8
-    host: smtp.163.com
-    port: 465
-    username: courseherovip2022@163.com
-    password: BCRYEZXHZYWYPTXP
-    properties:
-      mail:
-        smtp:
-          from: courseherovip2022@163.com
-          ssl:
-            enable: true
-          debug: false
-
+    template-loader-path: classpath:/templates/ #配置模板所在目录
 

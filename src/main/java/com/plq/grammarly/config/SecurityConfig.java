@@ -75,7 +75,7 @@ public class SecurityConfig {
                         "/exchangeCode/exchange", "/index", "/").permitAll()
 //                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated()
-                .and().formLogin().loginPage("/login")                      //登陆页面
+                .and().formLogin().loginPage("/index")                      //登陆页面,不跳转到login,防止泄露
                 .successForwardUrl("/exchangeCode/gen")
                 .and().exceptionHandling()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
