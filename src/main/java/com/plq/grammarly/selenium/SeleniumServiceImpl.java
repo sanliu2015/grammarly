@@ -99,16 +99,10 @@ public class SeleniumServiceImpl implements SeleniumService {
     @Override
     public void initEdgeSession() {
         try {
-            WebDriverManager webDriverManager = WebDriverManager.edgedriver();
-            webDriverManager.setup();
+            WebDriverManager.edgedriver().setup();
             EdgeOptions options = new EdgeOptions();
-//            // 没什么用
-//            Map<String, Object> prefs = new HashMap<>();
-//            prefs.put("debuggerAddress", "127.0.0.1:9333");
-//            prefs.put("download.prompt_for_download", false);
-//            prefs.put("download.default_directory", fileSaveDir);
-//            options.setExperimentalOption("prefs", prefs);
             options.setExperimentalOption("debuggerAddress", "127.0.0.1:9333");
+            options.addArguments("--remote-allow-origins=*");
             options.setPageLoadStrategy(PageLoadStrategy.NORMAL);
             options.setImplicitWaitTimeout(Duration.ofSeconds(10L));
             driver = new EdgeDriver(options);
