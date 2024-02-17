@@ -79,8 +79,8 @@
                         <div class="form-group">
                             <label for="name" class="control-label">账号类别:</label>
                             <select id="accountType" class="form-control">
-                                <option value="0">适用30天以下</option>
-                                <option value="1">适用30天及以上</option>
+                                <option value="0">Bussiness账号</option>
+                                <option value="1">Edu账号</option>
                             </select>
                         </div>
                         <div class="form-group">

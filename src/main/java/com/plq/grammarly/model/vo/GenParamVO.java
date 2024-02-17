@@ -27,4 +27,6 @@ public class GenParamVO {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date exchangeDeadline;
 
+    private Boolean ableRepeatExchange;
+
 }

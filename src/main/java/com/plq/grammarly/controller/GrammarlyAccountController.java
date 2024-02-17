@@ -42,9 +42,9 @@ public class GrammarlyAccountController {
         List<GrammarlyAccount> grammarlyAccounts = grammarlyAccountService.listAll();
         for (GrammarlyAccount grammarlyAccount : grammarlyAccounts) {
             if ("1".equals(grammarlyAccount.getAccountType())) {
-                grammarlyAccount.setTypeName("适用30天及以上");
+                grammarlyAccount.setTypeName("EDU账号");
             } else {
-                grammarlyAccount.setTypeName("适用30天以下");
+                grammarlyAccount.setTypeName("BUSINESS账号");
             }
             if (StrUtil.isEmpty(grammarlyAccount.getCurlStr())) {
                 grammarlyAccount.setCurlIsSet("未设置");

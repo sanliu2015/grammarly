@@ -9,7 +9,7 @@
     <!-- Bootstrap -->
     <link rel="stylesheet" href="${ctx.contextPath}/webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
     <link rel="stylesheet" href="${ctx.contextPath}/webjars/Eonasdan-bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" />
-    <link rel="stylesheet" href="//unpkg.com/layui@2.6.8/dist/css/layui.css">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/layui/2.9.1/css/layui.css">
 
     <!-- HTML5 shim 和 Respond.js 是为了让 IE8 支持 HTML5 元素和媒体查询（media queries）功能 -->
     <!-- 警告：通过 file:// 协议（就是直接将 html 页面拖拽到浏览器中）访问页面时 Respond.js 不起作用 -->
@@ -25,7 +25,7 @@
     <script src="${ctx.contextPath}/webjars/momentjs/2.10.3/min/moment-with-locales.min.js"></script>
     <script src="${ctx.contextPath}/webjars/Eonasdan-bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
     <script src="${ctx.contextPath}/webjars/js-cookie/2.2.1/js.cookie.min.js"></script>
-    <script src="//unpkg.com/layui@2.6.8/dist/layui.js"></script>
+    <script src="https://cdn.staticfile.org/layui/2.9.1/layui.js"></script>
 </head>
 <body>
 <div class="container">
@@ -86,6 +86,15 @@
                             <label for="account" class="col-sm-4 control-label"><span style="color: red">*</span>会员天数（单位：天）</label>
                             <div class="col-sm-8">
                                 <input type="number" required class="form-control" id="validDays" placeholder="必填项，例如：31，180">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="account" class="col-sm-4 control-label"><span style="color: red">*</span>允许重复兑换</label>
+                            <div class="col-sm-8">
+                                <select id="ableRepeatExchange" >
+                                    <option value="false">否，生成EDU兑换码请选择这个</option>
+                                    <option value="true">是，生成BUSINESS兑换码请选择这个</option>
+                                </select>
                             </div>
                         </div>
                         <div class="form-group">
@@ -164,6 +173,7 @@
                 ,{field:'number', width:160, title: '兑换码', fixed: 'left' }
                 ,{field:'createTime', width:180, title: '生成时间'}
                 ,{field:'exchangeDeadline', width:120, title: '截止兑换日'}
+                ,{field:'ableRepeatExchange', width:120, title: '重复兑换'}
                 ,{field:'exchangeStatus', width:90, title: '是否兑换', event: 'setExchangeStatus', style:'cursor: pointer;'}
                 ,{field:'exchangeTime', width:180, title: '兑换时间'}
                 ,{field:'email', minWidth: 200, title: '兑换邮箱'}
@@ -319,9 +329,18 @@
                 layer.msg("生成数量不能为空", function(){});
                 return false;
             }
+            let ableRepeatExchange = $("#ableRepeatExchange").val();
+            if (ableRepeatExchange === "") {
+                layer.msg("请设置是否允许重复兑换", function(){});
+                return false;
+            }
+            ableRepeatExchange = $("#ableRepeatExchange").val() === "true";
+            console.log($("#ableRepeatExchange").val())
+            console.log(ableRepeatExchange,)
             let data = {
                 count: count,
-                validDays: validDays
+                validDays: validDays,
+                ableRepeatExchange:ableRepeatExchange
             }
             if ($("#exchangeDeadline").val()) {
                 data.exchangeDeadline = $("#exchangeDeadline").val();

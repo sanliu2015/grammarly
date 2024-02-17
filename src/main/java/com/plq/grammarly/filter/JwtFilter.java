@@ -38,7 +38,7 @@ public class JwtFilter extends OncePerRequestFilter {
             String username = null;
             Cookie[] cookies = request.getCookies();
             if (cookies != null) {
-                Map<String,Cookie> cookieMap = Maps.newHashMapWithExpectedSize(cookies.length);
+                Map<String, Cookie> cookieMap = Maps.newHashMapWithExpectedSize(cookies.length);
                 for (Cookie cookie : cookies) {
                     cookieMap.put(cookie.getName(), cookie);
                 }
@@ -49,11 +49,6 @@ public class JwtFilter extends OncePerRequestFilter {
                     username = cookieMap.get("gp-username").getValue();
                 }
             }
-
-//        final String authorizationHeader = request.getHeader("Authorization");
-//        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-//            jwt = authorizationHeader.substring(7);
-//            username = jwtUtil.extractUsername(jwt);
 //        }
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -77,12 +72,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
     /**
      * 是否需要jwt认证的url
+     *
      * @param request
      * @return
      */
     private boolean isProtectedUrl(HttpServletRequest request) {
         String urlPath = request.getServletPath();
-        String[] ignorePaths = new String[] {"/login", "/api/v1/login", "/webjars/**", "/exchangeCode/exchange", "/index", "/"};
+        String[] ignorePaths = new String[]{"/login", "/api/v1/login", "/webjars/**", "/exchangeCode/exchange", "/index", "/activate", "/confirm","/"};
         AntPathMatcher antPathMatcher = new AntPathMatcher();
         for (String pattern : ignorePaths) {
             if (antPathMatcher.match(pattern, urlPath)) {

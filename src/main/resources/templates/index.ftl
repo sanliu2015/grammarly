@@ -1,13 +1,11 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>兑换码兑换</title>
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="${ctx.contextPath}/webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/bootstrap/5.3.2/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <!-- HTML5 shim 和 Respond.js 是为了让 IE8 支持 HTML5 元素和媒体查询（media queries）功能 -->
     <!-- 警告：通过 file:// 协议（就是直接将 html 页面拖拽到浏览器中）访问页面时 Respond.js 不起作用 -->
@@ -21,53 +19,121 @@
     <script src="${ctx.contextPath}/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <!-- 日期控件 -->
     <script src="${ctx.contextPath}/webjars/layer/dist/layer.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f4f4f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 500px; /* 调整为更合适的宽度 */
+        }
+
+        h1, h2 {
+            color: #d9534f; /* 鲜艳的红色 */
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-horizontal {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form-group {
+            width: 100%; /* 设置宽度以便于居中 */
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            text-align: center;
+            display: block;
+            font-weight: bold;
+        }
+
+        .btn-primary, .link-button {
+            width: 100%;
+            padding: 10px 0;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            background-color: #d9534f;
+            border-color: #d9534f;
+        }
+
+        .btn-primary:hover {
+            background-color: #c9302c;
+            border-color: #c9302c;
+        }
+
+        .link-button {
+            display: block;
+            background-color: #d9534f;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            padding: 10px 0;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .link-button:hover {
+            background-color: #c9302c;
+            color: #fff;
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
-    <form class="form-horizontal" style="margin-top: 60px;">
+    <h1><i class="fas fa-exchange-alt"></i> Grammarly会员激活</h1>
+    <form class="form-horizontal" style="margin-top: 30px;">
         <div class="form-group">
-            <label for="account" class="col-sm-4 control-label"><span style="color: red">*</span>兑换码</label>
-            <div class="col-sm-8">
-                <input type="text" class="form-control" id="number" placeholder="必填项">
+            <label for="number">兑换码</label>
+            <input type="text" class="form-control" id="number" placeholder="兑换码/激活码">
+        </div>
+        <div class="form-group">
+            <label for="email">邮箱</label>
+            <input type="email" class="form-control" id="email" placeholder="需要激活的会员邮箱">
+        </div>
+        <div class="form-group">
+            <div class="col-sm-12">
+                <button type="button" class="btn btn-primary" onclick="submitForm()">第一步：兑换会员</button>
+            </div>
+        </div>
+        <div class="form-group" >
+            <div class="col-sm-12">
+                <a href="https://www.grammarly.com/business/activate" class="link-button" ><span
+                            style="color:#ffffff;font-weight: bolder">第二步:激活会员</span></a>
+            </div>
+        </div>
+        <div class="form-group" style="accent-color: #007bff">
+            <div class="col-sm-12">
+                <a href="https://note.youdao.com/s/D3A7f0O0" class="link-button">问题1：收不到6位数字验证码请点我</a>
             </div>
         </div>
         <div class="form-group">
-            <label for="account" class="col-sm-4 control-label"><span style="color: red">*</span>邮箱</label>
-            <div class="col-sm-8">
-                <input type="email" class="form-control" id="email" placeholder="必填项，接收邮箱">
+            <div class="col-sm-12">
+                <a href="https://note.youdao.com/s/3p7U2Ono" class="link-button">问题2：其他问题请点我</a>
             </div>
         </div>
         <div class="form-group">
-            <div class="col-sm-offset-4 col-sm-8">
-                <button type="button" class="btn btn-success" onclick="submitForm()">确 定</button>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="mb-5">
-                <br class="btn btn-primary btn-lg px-3 col-sm-offset-4 col-sm-6">
-                <text class="btn btn-primary btn-lg px-3 col-sm-offset-4 col-sm-6" overflow="hidden">请先输入兑换码与兑换邮箱
-                plz enter activate code and email first</text>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="mb-5">
-                <a href="https://www.grammarly.com/business/join-existing?sid=S1noCBafdksruA8hiPcd" class="btn btn-primary btn-lg px-4 col-sm-offset-4 col-sm-6">收不到激活邮件请点我手动激活，
-                    sign in后join team即可激活</a>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="mb-5">
-                <a href="https://note.youdao.com/s/D3A7f0O0" class="btn btn-primary btn-lg px-4 col-sm-offset-4 col-sm-6">收不到6位数字验证码请点我</a>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="mb-5">
-                <a href="https://note.youdao.com/s/3p7U2Ono" class="btn btn-primary btn-lg px-4 col-sm-offset-4 col-sm-6">其他问题请点我</a>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="mb-5">
-                <text class="btn btn-primary btn-lg px-3 col-sm-offset-4 col-sm-6">售后请联系淘宝客服或者微信客服:leke123123(不定时有福利))</text>
+            <div class="col-sm-12">
+                <p class="link-button">售后请联系淘宝客服/微信客服:leke123123</p>
             </div>
         </div>
     </form>
@@ -89,9 +155,8 @@
         let data = {
             number: number,
             email: email
-        }
-        layer.confirm('确定激活账号邮箱是' + email+"，请仔细确认邮箱！" +
-            "兑换后不可更换！更换邮箱需要收20元手续费", function(index){
+        };
+        layer.confirm('确定激活账号邮箱是 <strong><span style="color:red">' + email + '</span></strong><br>请仔细确认邮箱！<br>兑换后不可更换！更换邮箱需要收 <strong><span style="color:red">20元手续费</span></strong> ', function (index) {
             layer.close(index);
             layer.load();
             $.ajax({
@@ -103,9 +168,20 @@
                 data: JSON.stringify(data),
                 success: function (res) {
                     if (res.code == 200) {
-                        // 兑换成功提示
-                        layer.msg("恭喜您，兑换成功，请注意查收来自grammarly的确认邮件" +
-                            "如果没收到请点击下面的->收不到激活邮件请点我手动激活", {icon: 1, time: 3000}, function () {
+                        layer.open({
+                            content: '<span style="font-size: 16px; font-weight: bold;">恭喜您，兑换成功！' +
+                                '<br>请点击邮箱内的激活邮件' +
+                                '<br>' +
+                                '或者点击<span style="color: #c9302c;font-weight: bolder" >下方按钮跳转到到第二步激活</span></span>',
+                            btn: ['OK'],
+                            yes: function (index) {
+                                layer.close(index);
+                                redirectToConfirmation(email);
+                            },
+                            time: 5000, // 5秒后自动关闭
+                            end: function () {
+                                redirectToConfirmation(email); // 修改这里
+                            }
                         });
                     } else {
                         layer.alert(res.msg, {icon: 5});

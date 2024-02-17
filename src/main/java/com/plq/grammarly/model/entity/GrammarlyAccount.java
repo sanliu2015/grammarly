@@ -38,7 +38,7 @@ public class GrammarlyAccount implements Serializable {
     private String password;
 
     /**
-     * 账户类型: 0-表示月卡以下，1-月卡及以上
+     * 账户类型: 0-表示BUSINESS，1-EDU
      */
     @NotNull(message = "账户类型不能为空")
     private String accountType;

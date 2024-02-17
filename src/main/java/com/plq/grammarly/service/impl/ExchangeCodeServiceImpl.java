@@ -20,6 +20,8 @@ import com.plq.grammarly.service.GrammarlyAccountService;
 import com.plq.grammarly.util.BizUtil;
 import com.plq.grammarly.util.Result;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
@@ -49,6 +51,16 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
     private final ExchangeCodeRepository exchangeCodeRepository;
     private final GrammarlyAccountService grammarlyAccountService;
 
+    /**
+     * 不可重复兑换的兑换码状态为1，需要将兑换状态设置为false
+     */
+    private static final String DISABLE_REPEAT_EXCHANGE = "1";
+
+    /**
+     * 可重复兑换的兑换码状态为0
+     */
+    private static final String ABLE_REPEAT_EXCHANGE = "0";
+
     public ExchangeCodeServiceImpl(ExchangeCodeRepository exchangeCodeRepository, GrammarlyAccountService grammarlyAccountService) {
         this.exchangeCodeRepository = exchangeCodeRepository;
         this.grammarlyAccountService = grammarlyAccountService;
@@ -65,6 +77,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                 ExchangeCode exchangeCode = ExchangeCode.builder()
                         .number(number).validDays(genParamVO.getValidDays())
                         .exchangeDeadline(genParamVO.getExchangeDeadline())
+                        .ableRepeatExchange(genParamVO.getAbleRepeatExchange())
                         .exchangeStatus(false)
                         .expireStatus(false)
                         .removeStatus(false)
@@ -72,7 +85,7 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                 try {
                     exchangeCodeRepository.save(exchangeCode);
                     numbers.add(number);
-                    genCount ++;
+                    genCount++;
                 } catch (Exception e) {
                     log.warn("生成的兑换码重复{}，丢弃，继续重生", number);
                 }
@@ -90,38 +103,61 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
         ExchangeCode exchangeCode = exchangeCodeRepository.findOne(example).orElse(null);
         if (exchangeCode == null) {
             return Result.failure("不存在此兑换码");
-        } else {
-            if (exchangeCode.getExchangeStatus()) {
-                return Result.failure("此兑换码已经被兑换");
-            }
-            if (exchangeCode.getExchangeDeadline() != null) {
-                if (DateUtil.compare(exchangeCode.getExchangeDeadline(), new Date()) < 0) {
-                    return Result.failure("此兑换码已超过兑换截止日期：" + DateUtil.format(exchangeCode.getExchangeDeadline(), "yyyyMMdd"));
-                }
-            }
-            exchangeCode.setEmail(exchangeParamVO.getEmail());
-            boolean result = addMember(exchangeCode);
-            if (result) {
-                return Result.success("兑换成功，请前往您的邮箱进行查收！");
-            } else {
-                return Result.failure("兑换过程出错，请联系客服！");
+        }
+        if (exchangeCode.getRemoveStatus() || exchangeCode.getExpireStatus()) {
+            return Result.failure("该兑换码已过期");
+        }
+        if (exchangeCode.getExchangeDeadline() != null) {
+            if (DateUtil.compare(exchangeCode.getExchangeDeadline(), new Date()) < 0) {
+                return Result.failure("该兑换码已超过兑换截止日期：" + DateUtil.format(exchangeCode.getExchangeDeadline(), "yyyyMMdd"));
             }
         }
+        Integer validDays = exchangeCode.getValidDays();
+        if (validDays == null) {
+            return Result.failure("该兑换码无有效期，请联系客服");
+        }
+        if (exchangeCode.getMemberDeadline() != null) {
+            if (DateUtil.compare(exchangeCode.getMemberDeadline(), new Date()) < 0) {
+                return Result.failure("此兑换码已过期，请重新下单，兑换时间是：" + DateUtil.format(exchangeCode.getExchangeTime(), "yyyy年MM月dd日 HH时mm分"));
+            }
+        }
+
+        // 可重复兑换，判断邮箱状态
+        String exchangeEmail = exchangeCode.getEmail();
+        String repeatEmail = exchangeParamVO.getEmail();
+        if (StringUtils.isNotEmpty(exchangeEmail)) {
+            if (!StringUtils.equals(repeatEmail, exchangeEmail)) {
+                return Result.failure("该兑换码绑定的邮箱与输入邮箱不一致，请用此邮箱" + exchangeEmail + "兑换");
+            }
+        }
+
+        exchangeCode.setEmail(repeatEmail);
+        boolean result = addMember(exchangeCode);
+        if (result) {
+            return Result.success("兑换成功，请前往您的邮箱进行查收！");
+        } else {
+            return Result.failure("兑换过程出错，请联系客服！");
+        }
+
     }
 
     /**
      * 邀请成员
+     *
      * @param exchangeCode 兑换实体
      */
     private boolean addMember(ExchangeCode exchangeCode) {
-        String accountType = exchangeCode.getValidDays() < 30 ? "0" : "1";
+        // 根据是否可重复兑换选择账号类型，之前的逻辑是小于30天为可重复兑换
+        String accountType = exchangeCode.getValidDays() > 30 ? ABLE_REPEAT_EXCHANGE : DISABLE_REPEAT_EXCHANGE;
+        if (exchangeCode.getAbleRepeatExchange() != null) {
+            accountType = exchangeCode.getAbleRepeatExchange() == true ? ABLE_REPEAT_EXCHANGE : DISABLE_REPEAT_EXCHANGE;
+        }
         List<GrammarlyAccount> accounts = grammarlyAccountService.listByAccountType(accountType);
         // 如果优先根据会员天数对应分类没找到，采取查找所有
         if (accounts.size() == 0) {
             log.error("优先根据会员天数{}对应分类没找到grammarly账号配置，故查找所有分类配置", exchangeCode.getValidDays());
             accounts = grammarlyAccountService.listAll();
         }
-//        Collections.shuffle(accounts);    // 随机排序
         // 创建时间降序
         Collections.sort(accounts, (o1, o2) -> {
             int i = o2.getCreateTime().compareTo(o1.getCreateTime());
@@ -147,26 +183,34 @@ public class ExchangeCodeServiceImpl implements ExchangeCodeService {
                 HttpRequest httpRequest = BizUtil.buildInviteHttpRequest(httpRequestHeadMap);
                 httpRequest.body(body);
                 try {
-                   HttpResponse httpResponse = httpRequest.timeout(30000).execute();
-                   if (httpResponse.getStatus() == HttpStatus.HTTP_OK) {
-                       successFlag = true;
-                       exchangeCode.setInviterAccount(grammarlyAccount.getAccount());
-                       exchangeCode.setExchangeTime(new Date());
-                       exchangeCode.setExchangeStatus(true);
-                       exchangeCode.setMemberDeadline(DateUtil.offsetDay(exchangeCode.getExchangeTime(), exchangeCode.getValidDays()));
-                       exchangeCode.setErrorMsg("");
-                       log.info("grammarly账号：{}，邀请{}成功，响应码：{}，响应体：{}", grammarlyAccount.getAccount(),
-                               exchangeCode.getEmail(), httpResponse.getStatus(), httpResponse.body());
-                       break;
-                   } else {
-                       StringBuilder sb = new StringBuilder(exchangeCode.getErrorMsg() == null ? "" : exchangeCode.getErrorMsg());
-                       sb.append("grammarly账号：").append(grammarlyAccount.getAccount())
-                               .append("邀请失败，响应码:").append(httpResponse.getStatus())
-                               .append("|");
-                       log.info("grammarly账号：{}，邀请{}失败，响应码：{}，响应体：{}", grammarlyAccount.getAccount(),
-                               exchangeCode.getEmail(), httpResponse.getStatus(), httpResponse.body());
-                       exchangeCode.setErrorMsg(sb.toString());
-                   }
+                    HttpResponse httpResponse = httpRequest.timeout(30000).execute();
+                    if (httpResponse.getStatus() == HttpStatus.HTTP_OK) {
+                        successFlag = true;
+                        exchangeCode.setInviterAccount(grammarlyAccount.getAccount());
+                        exchangeCode.setExchangeTime(new Date());
+                        if (accountType.equals(DISABLE_REPEAT_EXCHANGE)) {
+                            exchangeCode.setAbleRepeatExchange(false);
+                        } else {
+                            exchangeCode.setAbleRepeatExchange(true);
+                        }
+                        exchangeCode.setExchangeStatus(true);
+                        // 重复兑换，不能更改有效期
+                        if (exchangeCode.getMemberDeadline() == null) {
+                            exchangeCode.setMemberDeadline(DateUtil.offsetDay(exchangeCode.getExchangeTime(), exchangeCode.getValidDays()));
+                        }
+                        exchangeCode.setErrorMsg("");
+                        log.info("grammarly账号：{}，邀请{}成功，响应码：{}，响应体：{}", grammarlyAccount.getAccount(),
+                                exchangeCode.getEmail(), httpResponse.getStatus(), httpResponse.body());
+                        break;
+                    } else {
+                        StringBuilder sb = new StringBuilder(exchangeCode.getErrorMsg() == null ? "" : exchangeCode.getErrorMsg());
+                        sb.append("grammarly账号：").append(grammarlyAccount.getAccount())
+                                .append("邀请失败，响应码:").append(httpResponse.getStatus())
+                                .append("|");
+                        log.info("grammarly账号：{}，邀请{}失败，响应码：{}，响应体：{}", grammarlyAccount.getAccount(),
+                                exchangeCode.getEmail(), httpResponse.getStatus(), httpResponse.body());
+                        exchangeCode.setErrorMsg(sb.toString());
+                    }
 
                 } catch (Exception e) {
                     log.error("grammarly邀请用户网络异常", e);

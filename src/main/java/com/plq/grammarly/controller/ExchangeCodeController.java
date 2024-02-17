@@ -35,6 +35,16 @@ public class ExchangeCodeController {
         return "index";
     }
 
+    @GetMapping(value = { "activate"} )
+    public String activate() {
+        return "activate";
+    }
+
+    @GetMapping(value = { "confirm"} )
+    public String confirm() {
+        return "confirm";
+    }
+
     @GetMapping("/exchangeCode")
     public String exchangeCode() {
         return "exchangeCode";

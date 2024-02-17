@@ -39,9 +39,15 @@ public class ExchangeCode implements Serializable {
     private Integer validDays;
 
     /**
+     * true代表可以重复兑换 false不行
+     * true--->Bussiness  false--》Edu
+     */
+    private Boolean ableRepeatExchange;
+
+    /**
      * 兑换截止时间，产生1个兑换码，必须在最后期限之前兑换
      */
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date exchangeDeadline;
 
     /**
@@ -52,6 +58,7 @@ public class ExchangeCode implements Serializable {
     /**
      * 生成日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @CreatedDate
     private Date createTime;
     /**
@@ -66,11 +73,13 @@ public class ExchangeCode implements Serializable {
     /**
      * 兑换日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date exchangeTime;
 
     /**
      * 会员到期日期=兑换日期exchange+有效天数validDays（只到天不到时分秒）
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date memberDeadline;
 
     /**
@@ -101,6 +110,7 @@ public class ExchangeCode implements Serializable {
     private String reason;
 
     @Tolerate
-    public ExchangeCode() {}
+    public ExchangeCode() {
+    }
 
 }
